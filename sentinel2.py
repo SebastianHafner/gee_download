@@ -1,23 +1,27 @@
 import ee
-from gee.spectral_indices import get_spectral_index_func
-from gee.utils import compute_time_series_metrics
-
-__SPECTRAL_BANDS__ = ['Blue', 'Green', 'Red', 'RedEdge1', 'RedEdge2', 'RedEdge3', 'NIR', 'RedEdge4', 'SWIR1', 'SWIR2']
-
-
-# getting list of feature names based on input parameters
-def get_feature_names(bands: list, indices: list, metrics: list):
-    band_names = [f'{band}_{metric}' for band in bands for metric in metrics]
-    index_names = [f'{index}_{metric}' for index in indices for metric in metrics]
-    return band_names + index_names
+import utils
+import math
 
 
 # getting sentinel-2 band name
-def get_band_name(band: str) -> str:
+def s2_band_name(band: str) -> str:
     band_names = ee.Dictionary({'Blue': 'B2', 'Green': 'B3', 'Red': 'B4', 'RedEdge1': 'B5', 'RedEdge2': 'B6',
                                 'RedEdge3': 'B7','NIR': 'B8', 'RedEdge4': 'B8A', 'SWIR1': 'B11', 'SWIR2': 'B12',
-                                'QA': 'QA60'})
+                                'QA': 'QA60', 'SCL': 'SCL'})
     return band_names.get(band)
+
+
+def s2_bands(identifier: str):
+    if identifier == 'all':
+        return ['Blue', 'Green', 'Red', 'RedEdge1', 'RedEdge2', 'RedEdge3', 'NIR', 'RedEdge4', 'SWIR1', 'SWIR2']
+    elif identifier == 'nre':
+        return ['Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2']
+    elif identifier == 'tm':
+        return ['Blue', 'Green', 'Red', 'NIR']
+    elif identifier == 'rgb':
+        return ['Blue', 'Green', 'Red']
+    else:
+        return []
 
 
 # function to mask clouds in a sentinel-2 image
@@ -34,54 +38,65 @@ def cloud_mask(img: ee.Image) -> ee.Image:
 # function to mask snow in a sentinel-2 image
 def snow_mask(img: ee.Image) -> ee.Image:
     img = ee.Image(img)
-    # TODO: assert that it is a surface reflectance image (otherwise no SCL band)
     no_snow = img.select('SCL').eq(11).Not()
     return img.updateMask(no_snow)
 
 
-# retrieve sentinel-2 data for region of interest (bbox)
-def get_time_series_features(bbox: ee.Geometry, from_date: str, to_date: str, bands: list = None,
-                             indices: list = [], metrics: list = ['median'], include_count: bool = False):
+def s2sr_collection(bbox: ee.Geometry, date_range: tuple, include_bands: str,
+                    mask_clouds: bool = True, mask_snow: bool = True, normalize: bool = True):
 
-    # getting all sentinel-2 (TOA) imagery
-    s2 = ee.ImageCollection('COPERNICUS/S2')
+    # getting all sentinel-2 surface reflectance scenes
+    collection = ee.ImageCollection('COPERNICUS/S2_SR') \
+        .filterBounds(bbox) \
+        .filterDate(*date_range)
 
-    # creating selection of band names
-    if bands is None:
-        bands = __SPECTRAL_BANDS__
+    # selecting bands
+    bands = s2_bands(include_bands)
+    bands_plus_quality = ee.List([*bands, 'QA', 'SCL'])
+    collection = collection.select(bands_plus_quality.map(lambda band: s2_band_name(band)), bands_plus_quality)
 
-    all_bands = ee.List([*__SPECTRAL_BANDS__, 'QA'])
+    if mask_clouds:
+        collection = collection.map(cloud_mask)
+    if mask_snow:
+        collection = collection.map(snow_mask)
+    if normalize:
+        collection = collection.map(utils.normalize(0, 10000))
 
-    # selecting specified band names
-    s2 = s2.select(all_bands.map(lambda band: get_band_name(band)), all_bands)
+    collection = collection.select(bands)
 
-    # sub-setting imagery intersecting bounding box of city
-    s2 = s2.filterBounds(bbox)
+    return collection
 
-    # sub-setting imagery to input year
-    s2 = s2.filterDate(from_date, to_date)
 
-    # addressing clouds
-    max_cloud_percentage = 60
-    s2 = s2.filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'not_greater_than', max_cloud_percentage)
-    print(f'Number of Sentinel-2 scenes (cloud percentage <= 60 %): {s2.size().getInfo()}')
-    s2 = s2.map(cloud_mask)
+def s2toa_collection(bbox: ee.Geometry, date_range: tuple, include_bands: str,
+                     mask_clouds: bool = True, normalize: bool = True):
 
-    # linearly rescale all images from [0, 10'000] to [0, 1]
-    s2 = s2.map(lambda img: ee.Image(img).divide(10000).clamp(0, 1))
+    # getting all sentinel-2 top of atmosphere scenes
+    collection = ee.ImageCollection('COPERNICUS/S2') \
+        .filterBounds(bbox) \
+        .filterDate(*date_range)
 
-    # adding spectral indices
-    for index in indices:
-        index_func = get_spectral_index_func(index)
-        s2 = s2.map(index_func)
+    # selecting bands
+    bands = s2_bands(include_bands)
+    bands_plus_quality = ee.List([*bands, 'QA'])
+    collection = collection.select(bands_plus_quality.map(lambda band: s2_band_name(band)), bands_plus_quality)
 
-    # sub-setting to selected spectral bands and indices
-    s2 = s2.select([*bands, *indices])
+    if mask_clouds:
+        collection = collection.map(cloud_mask)
+    if normalize:
+        collection = collection.map(utils.normalize(0, 10000))
 
-    # compute statistical metrics of image time series
-    features = compute_time_series_metrics(s2, bands, metrics)
+    collection = collection.select(bands)
 
-    if include_count:
-        features = features.addBands(s2.reduce(ee.Reducer.count()).rename('count'))
+    return collection
 
-    return features.unmask().float()
+
+def simple_cloud_mosaicking(collection: ee.ImageCollection) -> ee.Image:
+
+    print(collection.size().getInfo())
+    quality_property = 'CLOUDY_PIXEL_PERCENTAGE'
+    sorted_collection = collection.sort(quality_property, opt_ascending=False)
+    print(collection.size().getInfo())
+    mosaic = sorted_collection.mosaic().float()
+
+    return mosaic
+

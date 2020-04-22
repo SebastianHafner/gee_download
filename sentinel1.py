@@ -1,5 +1,4 @@
 import ee
-from gee.utils import compute_time_series_metrics
 
 
 # getting list of feature names based on input parameters
