@@ -1,0 +1,41 @@
+'''
+This is a global default file, each individual project will have their own respective default file
+'''
+from .config import CfgNode as CN
+
+C = CN()
+
+C.CONFIG_DIR = 'config/'
+C.GEE_USERNAME = ''
+C.PIXEL_SPACING = 10
+C.CRS = 'UTM'
+C.ERROR_MARGIN = 0.01
+C.PATH = 'C:/Users/hafne/urban_extraction/data/samples/'
+
+C.SATELLITE_DATA = CN()
+C.SATELLITE_DATA.DATE_RANGE = []
+C.SATELLITE_DATA.RECORDS = []
+
+C.BUILDING_FOOTPRINTS = CN()
+C.BUILDING_FOOTPRINTS.PIXEL_PERCENTAGE = True
+C.BUILDING_FOOTPRINTS.ASSETS = []
+
+C.ROI = CN()
+C.ROI.ID = ''
+C.ROI.LNG_RANGE = [0, 0]
+C.ROI.LAT_RANGE = [0, 0]
+
+
+C.SAMPLING = CN()
+C.SAMPLING.PATCH_SIZE = 256
+C.SAMPLE_FRACTION = 0.3
+C.MAX_SAMPLE_SIZE = 800
+C.NEIGHBORHOOD_SIZE = 50
+C.SEED = 7
+
+C.DOWNLOAD = CN()
+C.DOWNLOAD.TYPE = ''
+C.DOWNLOAD.BUCKET_NAME = 'bucket_name'
+C.DOWNLOAD.DRIVE_FOLDER = 'folder_name'
+C.DOWNLOAD.TABLE_FORMAT = 'GeoJSON'
+C.DOWNLOAD.IMAGE_FORMAT = 'GeoTIFF'
