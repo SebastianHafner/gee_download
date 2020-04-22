@@ -1,31 +1,37 @@
 import ee
 
 
-def compute_time_series_metrics(time_series: ee.ImageCollection, bands: list, metrics: list) -> ee.Image:
+def extract_bbox(cfg) -> ee.Geometry:
+    lng_min, lng_max = cfg.ROI.LNG_RANGE
+    lat_min, lat_max = cfg.ROI.LAT_RANGE
+    bbox = ee.Geometry.Rectangle([[lng_min, lat_min], [lng_max, lat_max]])
+    # bbox = bbox.transform(proj=cfg.ROI.UTM_EPSG, maxError=cfg.ERROR_MARGIN)
+    return bbox
 
-    time_series_metrics = []
-    if 'mean' in metrics:
-        time_series_metrics.append(time_series.reduce(ee.Reducer.mean()))
-    if 'median' in metrics:
-        time_series_metrics.append(time_series.reduce(ee.Reducer.median()))
-    if 'max' in metrics:
-        time_series_metrics.append(time_series.reduce(ee.Reducer.max()))
-    if 'min' in metrics:
-        time_series_metrics.append(time_series.reduce(ee.Reducer.min()))
-    if 'stdDev' in metrics:
-        time_series_metrics.append(time_series.reduce(ee.Reducer.stdDev()))
-    if 'iqr' in metrics:
-        p25_bands = [f'{band}_p25' for band in bands]
-        p75_bands = [f'{band}_p75' for band in bands]
-        iqr_bands = [f'{band}_iqr' for band in bands]
-        percentiles = time_series.reduce(ee.Reducer.percentile([25, 75]))
-        iqr = percentiles.select(p75_bands).subtract(percentiles.select(p25_bands)) \
-            .select(p75_bands, iqr_bands)
-        time_series_metrics.append(iqr)
 
-    time_series_metrics = ee.Image.cat(time_series_metrics)
-    new_order = [f'{band}_{metric}' for band in bands for metric in metrics]
-    time_series_metrics = time_series_metrics.select(new_order)
+def extract_crs(cfg) -> str:
+    return cfg.ROI.UTM_EPSG
 
-    return time_series_metrics
+
+def extract_date_range(cfg):
+    date_range = ee.DateRange(*cfg.SATELLITE_DATA.DATE_RANGE)
+    return date_range
+
+
+def feature2patch(cfg, patch: dict) -> ee.Geometry:
+    coords = patch['geometry']['coordinates']
+    lower_left = coords[0][0]
+    upper_right = coords[0][2]
+    # print(lower_left, upper_right)
+    # crs = patch['geometry']['crs']['properties']['name']
+    # geodesic = patch['geometry']['geodesic']
+    geom = ee.Geometry.Rectangle(coords=[lower_left, upper_right])
+    # geom = geom.transform(proj=cfg.ROI.UTM_EPSG, maxError=cfg.ERROR_MARGIN)
+    return geom
+
+
+def normalize(min_value: float, max_value: float) -> callable:
+    def normalize_mapper(img: ee.Image):
+        return img.subtract(min_value).divide(max_value - min_value).clamp(0, 1).copyProperties(img)
+    return normalize_mapper
 
