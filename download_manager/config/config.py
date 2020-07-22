@@ -135,3 +135,11 @@ def load_from_yml():
     :return:
     '''
     pass
+
+
+def setup(args):
+    cfg = new_config()
+    cfg.merge_from_file(f'configs/{args.config_file}.yaml')
+    cfg.merge_from_list(args.opts)
+    cfg.NAME = args.config_file
+    return cfg

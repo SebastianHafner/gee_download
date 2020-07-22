@@ -1,4 +1,6 @@
 import ee
+import json
+from pathlib import Path
 
 
 def extract_bbox(cfg) -> ee.Geometry:
@@ -18,20 +20,44 @@ def extract_date_range(cfg):
     return date_range
 
 
-def feature2patch(cfg, patch: dict) -> ee.Geometry:
-    coords = patch['geometry']['coordinates']
-    lower_left = coords[0][0]
-    upper_right = coords[0][2]
-    # print(lower_left, upper_right)
-    # crs = patch['geometry']['crs']['properties']['name']
-    # geodesic = patch['geometry']['geodesic']
-    geom = ee.Geometry.Rectangle(coords=[lower_left, upper_right])
-    # geom = geom.transform(proj=cfg.ROI.UTM_EPSG, maxError=cfg.ERROR_MARGIN)
-    return geom
+# loading sample points from (geo)json file
+def load_samples(cfg) -> list:
+    # loading sampling points
+    samples_file = Path(f'{cfg.PATH}/points_{cfg.ROI.ID}.geojson')
+    with open(samples_file) as f:
+        features = json.load(f)['features']
+    features = [feature for feature in features if feature.get('properties').get('densityZone') != 0]
+    return features
 
 
 def normalize(min_value: float, max_value: float) -> callable:
     def normalize_mapper(img: ee.Image):
         return img.subtract(min_value).divide(max_value - min_value).clamp(0, 1).copyProperties(img)
+
     return normalize_mapper
+
+
+# creating patch from from point sample according to config
+def feature2patch(cfg, feature) -> ee.Geometry:
+
+    # extracting properties
+    patch_size = ee.Number(cfg.SAMPLING.PATCH_SIZE)
+    pixel_spacing = ee.Number(cfg.PIXEL_SPACING)
+    crsUTM = cfg.ROI.UTM_EPSG
+    crsWGS84 = 'EPSG:4326'
+
+    # extracting coordinates from feature
+    coords = feature['geometry']['coordinates']
+
+    # converting point to patch
+    point = ee.Geometry.Point(coords)
+    point = point.transform(crsUTM)
+    buffer_distance = patch_size.divide(2).multiply(pixel_spacing)
+    patch = point.buffer(distance=buffer_distance, proj=crsUTM).bounds(proj=crsUTM)
+    patch = patch.transform(crsWGS84, 0.001)
+
+    return patch
+
+
+
 

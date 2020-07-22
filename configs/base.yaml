@@ -3,21 +3,22 @@ GEE_USERNAME: 'hafnersailing'
 PIXEL_SPACING: 10
 CRS: 'UTM'
 ERROR_MARGIN: 0.01
-PATH: 'C:/Users/hafne/urban_extraction/data/samples/'
+PATH: 'C:/Users/hafne/urban_extraction/data/samples'
 
 SATELLITE_DATA:
   DATE_RANGE: ['2018-06-01', '2018-09-01']
   RECORDS:
-    - SENSOR: 'sentinel2'
+    - SENSOR: 'sentinel2toa'
       BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
-      PRODUCT: 'cloud_free_mosaic'
+      PRODUCT: 'simple_cloud_free_mosaic'
       NORMALIZE: [0, 10_000]
     - SENSOR: 'sentinel1'
       BANDS: ['VV', 'VH']
       PRODUCT: 'single_orbit_mosaic'
       NORMALIZE: [-25, 0]
 
-BUILDING_FOOTPRINTS:
+MICROSOFT_BUILDINGS:
+  ID: 'buildings'
   PIXEL_PERCENTAGE: True
   ASSETS: []
 

@@ -63,6 +63,5 @@ def cloud_free_mosaic(patch: ee.Geometry, date_range) -> ee.Image:
     cloud_free_mosaic = s2toa_no_clouds.sort('patchScore', False).mosaic()
 
     final = ee.ImageCollection([cloud_free_mosaic, best_local, best]).mosaic()
-    final = final.select(['B2', 'B3', 'B4', 'B8', 'B11', 'B12']).divide(10000).clamp(0, 1).unmask().float()
 
     return final

@@ -31,12 +31,7 @@ def single_orbit_mean(patch: ee.Geometry, date_range) -> ee.Image:
         mean = col.filterMetadata('relativeOrbitNumber_start', 'equals', number).mean()
         means = means.merge(ee.ImageCollection([mean]))
 
-    mosaic = means \
-        .mosaic() \
-        .unitScale(-25, 5) \
-        .clamp(0, 1) \
-        .unmask() \
-        .float()
+    mosaic = means.mosaic()
 
     return mosaic
 

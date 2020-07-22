@@ -22,31 +22,34 @@ def setup(args):
 
 
 if __name__ == '__main__':
+
     # setting up config based on parsed argument
     parser = args.argument_parser()
     args = parser.parse_known_args()[0]
     cfg = setup(args)
 
-    ee.Initialize()
+    # extracting parameters from config
+    patch_size = ee.Number(cfg.SAMPLING.PATCH_SIZE)
+    pixel_spacing = ee.Number(cfg.PIXEL_SPACING)
+    crsUTM = cfg.ROI.UTM_EPSG
+    crsWGS84 = 'EPSG:4326'
 
+    # getting region of interest and date range of satellite data
+    ee.Initialize()
     roi = utils.extract_bbox(cfg)
     date_range = utils.extract_date_range(cfg)
 
+    # loading sampling points
     with open(f'{cfg.PATH}points_{cfg.ROI.ID}.geojson') as f:
         features = json.load(f)['features']
-
     features = [feature for feature in features if feature.get('properties').get('densityZone') != 0]
-    print(len(features))
+    print(f'Number of patches: {len(features)}')
 
     for i, feature in enumerate(features):
-        print(i)
+
+        print(f'Patch {i}')
         coords = feature['geometry']['coordinates']
         point = ee.Geometry.Point(coords)
-
-        patch_size = ee.Number(cfg.SAMPLING.PATCH_SIZE)
-        pixel_spacing = ee.Number(cfg.PIXEL_SPACING)
-        crsUTM = cfg.ROI.UTM_EPSG
-        crsWGS84 = 'EPSG:4326'
 
         point = point.transform(crsUTM)
         buffer_distance = patch_size.divide(2).multiply(pixel_spacing)

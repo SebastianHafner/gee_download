@@ -1,0 +1,32 @@
+_BASE_: "base.yaml"
+
+PATH: 'C:/Users/shafner/urban_extraction/data/samples'
+
+SATELLITE_DATA:
+  DATE_RANGE: ['2018-06-01', '2018-09-01']
+  RECORDS:
+    - SENSOR: 'sentinel1'
+      BANDS: ['VV', 'VH']
+      PRODUCT: 'single_orbit_mosaic'
+      NORMALIZE: [-25, 0]
+    - SENSOR: 'sentinel2toa'
+      BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+      PRODUCT: 'simple_cloud_free_mosaic'
+      NORMALIZE: [0, 10_000]
+
+BUILDING_FOOTPRINTS:
+  PIXEL_PERCENTAGE: True
+  ASSETS: ['Stockholm/real_estate_data']
+
+ROI:
+  ID: 'stockholm'
+  UTM_EPSG: 'EPSG:32634'
+  LNG_RANGE: [17.463906134700807, 18.541081275081666]
+  LAT_RANGE: [59.09669570045134, 59.616229094976966]
+
+DOWNLOAD:
+  TYPE: 'drive'
+  BUCKET_NAME: 'urban_extraction_buildings'
+  DRIVE_FOLDER: 'urban_extraction_debug'
+  TABLE_FORMAT: 'GeoJSON'
+  IMAGE_FORMAT: 'GeoTIFF'
