@@ -137,9 +137,9 @@ def load_from_yml():
     pass
 
 
-def setup(args):
+def setup(args, folder: str = 'configs'):
     cfg = new_config()
-    cfg.merge_from_file(f'configs/{args.config_file}.yaml')
+    cfg.merge_from_file(f'{folder}/{args.config_file}.yaml')
     cfg.merge_from_list(args.opts)
     cfg.NAME = args.config_file
     return cfg

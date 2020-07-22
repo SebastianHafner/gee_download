@@ -4,8 +4,8 @@ from download_manager import args
 from download_manager.config import config
 
 import satellite_data
+from data_processing import utils
 
-import utils
 
 
 if __name__ == '__main__':
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # setting up config based on parsed argument
     parser = args.argument_parser()
     args = parser.parse_known_args()[0]
-    cfg = config.setup(args)
+    cfg = config.setup(args, 'configs/urban_extraction')
 
     # extracting parameters from config
     records = cfg.SATELLITE_DATA.RECORDS

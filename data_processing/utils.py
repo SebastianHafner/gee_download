@@ -23,7 +23,7 @@ def extract_date_range(cfg):
 # loading sample points from (geo)json file
 def load_samples(cfg) -> list:
     # loading sampling points
-    samples_file = Path(f'{cfg.PATH}/points_{cfg.ROI.ID}.geojson')
+    samples_file = Path(f'{cfg.SAMPLING.PATH}/points_{cfg.ROI.ID}.geojson')
     with open(samples_file) as f:
         features = json.load(f)['features']
     features = [feature for feature in features if feature.get('properties').get('densityZone') != 0]

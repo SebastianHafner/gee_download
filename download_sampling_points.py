@@ -3,22 +3,12 @@ import ee
 from download_manager import args
 from download_manager.config import config
 
-import building_footprints
-import export
-import utils
+from data_processing import building_footprints, exports, utils
 
 
+def density_sampling(cfg, points: bool = True) -> ee.FeatureCollection:
 
-def setup(args):
-    cfg = config.new_config()
-    cfg.merge_from_file(f'configs/{args.config_file}.yaml')
-    cfg.merge_from_list(args.opts)
-    cfg.NAME = args.config_file
-    return cfg
-
-
-def density_sampling(cfg) -> ee.FeatureCollection:
-
+    # extracting sampling properties from config
     bbox = utils.extract_bbox(cfg)
     area = ee.Number(ee.Geometry(bbox).area(cfg.ERROR_MARGIN))
     patch_size = ee.Number(cfg.SAMPLING.PATCH_SIZE)
@@ -40,23 +30,8 @@ def density_sampling(cfg) -> ee.FeatureCollection:
     )
     print(sampling_region.getInfo())
 
-    # building_footprints = ee.FeatureCollection('users/hafnersailing/Stockholm/real_estate_data') \
-    #     .filterBounds(bbox) \
-    #     .map(lambda f: ee.Feature(f).set({'urban': 1}))
-    #
-    # building_raster = building_footprints.reduceToImage(['urban'], ee.Reducer.first()) \
-    #     .unmask() \
-    #     .float() \
-    #     .rename('urban') \
-    #     .clip(bbox)
-    #
-    # building_percentage = building_raster.reproject(crs=cfg.ROI.UTM_EPSG, scale=1) \
-    #     .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
-    #     .rename('buildingPercentage')
-
     building_percentage = building_footprints.get_building_percentage(cfg)
 
-    # building_percentage = building_footprints.get_building_percentage(cfg)
     kernel = ee.Kernel.square(ee.Number(cfg.SAMPLING.NEIGHBORHOOD_SIZE).divide(2))
     urban_density = building_percentage.reduceNeighborhood(
         reducer=ee.Reducer.mean(),
@@ -85,23 +60,37 @@ def density_sampling(cfg) -> ee.FeatureCollection:
         return ee.Feature(patch).copyProperties(feature)
 
     sampling_patches = sampling_points.map(point2patch)
+    sampling_patches = sampling_patches.map(lambda f: ee.Feature(f).transform(proj='EPSG:4326', maxError=0.01))
 
     sampling_points = sampling_points.map(lambda f: ee.Feature(f).transform(proj='EPSG:4326', maxError=0.01))
-    sampling_patches = sampling_patches.map(lambda f: ee.Feature(f).transform(proj='EPSG:4326', maxError=0.01))
-    return sampling_points
+
+    samples = sampling_points if points else sampling_patches
+
+    return samples
+
 
 if __name__ == '__main__':
     # setting up config based on parsed argument
     parser = args.argument_parser()
     args = parser.parse_known_args()[0]
-    cfg = setup(args)
+    cfg = config.setup(args, 'configs/urban_extraction')
 
     ee.Initialize()
 
-    sampling_patches = density_sampling(cfg)
+    points = True
+    samples = density_sampling(cfg, points=points)
+    sample_name = 'points' if points else 'patches'
 
-    task = export.table_to_drive(fc=sampling_patches, folder='gee_test_exports',
-                                 file_name=f'points_{cfg.ROI.ID}')
-    task.start()
+    dl_desc = f'DriveSample{sample_name.capitalize()}{cfg.ROI.ID}'
+    file_name = f'{sample_name}_{cfg.ROI.ID}'
 
+    dl_task = ee.batch.Export.table.toDrive(
+        collection=samples,
+        description=dl_desc,
+        folder=cfg.DOWNLOAD.DRIVE_FOLDER,
+        fileNamePrefix=file_name,
+        fileFormat=cfg.DOWNLOAD.TABLE_FORMAT
+    )
+
+    dl_task.start()
 

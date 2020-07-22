@@ -1,0 +1,29 @@
+GEE_USERNAME: 'hafnersailing'
+
+PIXEL_SPACING: 10
+CRS: 'UTM'
+ERROR_MARGIN: 0.01
+
+SATELLITE_DATA:
+  DATE_RANGE: ['2018-06-01', '2018-09-01']
+  RECORDS:
+    - SENSOR: 'sentinel2toa'
+      BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+      PRODUCT: 'simple_cloud_free_mosaic'
+      NORMALIZE: True
+      NORMALIZATION_BOUDNS: [0, 10_000]
+
+ROI:
+  ID: 'kigali'
+  UTM_EPSG: ''
+  LNG_RANGE: [0, 0]
+  LAT_RANGE: [0, 0]
+
+
+DOWNLOAD:
+  TYPE: 'drive'
+  BUCKET_NAME: 'gee_downloads_lcc_kigali'
+  DRIVE_FOLDER: 'gee_downloads_lcc_kigali'
+  TABLE_FORMAT: 'GeoJSON'
+  IMAGE_FORMAT: 'GeoTIFF'
+  MAX_IMAGE_SIZE: None

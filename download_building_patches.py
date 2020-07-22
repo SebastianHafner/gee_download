@@ -12,7 +12,7 @@ if __name__ == '__main__':
     # setting up config based on parsed argument
     parser = args.argument_parser()
     args = parser.parse_known_args()[0]
-    cfg = config.setup(args)
+    cfg = config.setup(args, 'configs/urban_extraction')
 
     # extracting parameters from config
     dl_type = cfg.DOWNLOAD.TYPE

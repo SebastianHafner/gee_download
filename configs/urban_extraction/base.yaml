@@ -3,7 +3,6 @@ GEE_USERNAME: 'hafnersailing'
 PIXEL_SPACING: 10
 CRS: 'UTM'
 ERROR_MARGIN: 0.01
-PATH: 'C:/Users/hafne/urban_extraction/data/samples'
 
 SATELLITE_DATA:
   DATE_RANGE: ['2018-06-01', '2018-09-01']
@@ -11,11 +10,13 @@ SATELLITE_DATA:
     - SENSOR: 'sentinel2toa'
       BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
       PRODUCT: 'simple_cloud_free_mosaic'
-      NORMALIZE: [0, 10_000]
+      NORMALIZE: True
+      NORMALIZATION_BOUDNS: [0, 10_000]
     - SENSOR: 'sentinel1'
       BANDS: ['VV', 'VH']
       PRODUCT: 'single_orbit_mosaic'
-      NORMALIZE: [-25, 0]
+      NORMALIZE: True
+      NORMALIZATION_BOUNDS: [-25, 0]
 
 MICROSOFT_BUILDINGS:
   ID: 'buildings'
@@ -34,10 +35,11 @@ SAMPLING:
   MAX_SAMPLE_SIZE: 800
   NEIGHBORHOOD_SIZE: 50
   SEED: 7
+  PATH: 'C:/Users/hafne/urban_extraction/data/samples'
 
 DOWNLOAD:
   TYPE: '' # drive or cloud
-  BUCKET_NAME: 'urban_extraction_buildings'
-  DRIVE_FOLDER: 'folder_name'
+  BUCKET_NAME: 'gee_downloads_urban_extraction'
+  DRIVE_FOLDER: 'gee_downloads_urban_extraction'
   TABLE_FORMAT: 'GeoJSON'
   IMAGE_FORMAT: 'GeoTIFF'
