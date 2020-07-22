@@ -50,7 +50,8 @@ def density_sampling(cfg, points: bool = True) -> ee.FeatureCollection:
         scale=cfg.PIXEL_SPACING,
         projection=cfg.ROI.UTM_EPSG,
         dropNulls=True,
-        geometries=True
+        geometries=True,
+        seed=cfg.SAMPLING.SEED
     )
 
     def point2patch(feature: ee.Feature) -> ee.Feature:
