@@ -49,7 +49,7 @@ if __name__ == '__main__':
                 dl_task = ee.batch.Export.image.toCloudStorage(
                     image=img,
                     region=patch.getInfo()['coordinates'],
-                    description='PythonToCloudExport',
+                    description=dl_desc,
                     bucket=cfg.DOWNLOAD.BUCKET_NAME,
                     fileNamePrefix=f'{cfg.ROI.ID}/{sensor}/{img_name}',
                     scale=cfg.PIXEL_SPACING,
@@ -63,7 +63,7 @@ if __name__ == '__main__':
                 dl_task = ee.batch.Export.image.toDrive(
                     image=img,
                     region=patch.getInfo()['coordinates'],
-                    description='PythonToDriveExport',
+                    description=dl_desc,
                     folder=cfg.DOWNLOAD.DRIVE_FOLDER,
                     fileNamePrefix=img_name,
                     scale=cfg.PIXEL_SPACING,

@@ -21,7 +21,7 @@ def get_satellite_data(properties: dict, roi: ee.Geometry, date_range) -> ee.Ima
     product = properties['PRODUCT']
     bands = properties['BANDS']
     normalize = properties['NORMALIZE']
-    normalization_range = properties['NORMALIZATION_RANGE']
+    normalization_range = properties['NORMALIZATION_BOUNDS']
 
     func = processing_functions[sensor][product]
     img = func(roi, date_range)

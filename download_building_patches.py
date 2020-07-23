@@ -3,9 +3,7 @@ import ee
 from download_manager import args
 from download_manager.config import config
 
-import building_footprints
-
-import utils
+from data_processing import building_footprints, utils
 
 if __name__ == '__main__':
 

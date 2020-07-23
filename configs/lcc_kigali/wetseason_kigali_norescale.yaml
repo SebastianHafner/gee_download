@@ -1,0 +1,17 @@
+_BASE_: "base.yaml"
+
+
+SATELLITE_DATA:
+  DATE_RANGE: ['2016-06-01', '2016-09-01']
+  RECORDS:
+    - SENSOR: 'sentinel2toa'
+      BANDS: ['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B9', 'B10', 'B11', 'B12']
+      PRODUCT: 'simple_cloud_free_mosaic'
+      NORMALIZE: False
+      NORMALIZATION_BOUNDS: [0, 10_000]
+
+ROI:
+  ID: 'kigali'
+  UTM_EPSG: 'EPSG:32736'
+  LNG_RANGE: [30.02004938932589, 30.23153620573214]
+  LAT_RANGE: [-2.026194653585059, -1.8585779136948595]

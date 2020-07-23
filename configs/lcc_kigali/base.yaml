@@ -11,7 +11,7 @@ SATELLITE_DATA:
       BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
       PRODUCT: 'simple_cloud_free_mosaic'
       NORMALIZE: True
-      NORMALIZATION_BOUDNS: [0, 10_000]
+      NORMALIZATION_BOUNDS: [0, 10_000]
 
 ROI:
   ID: 'kigali'
