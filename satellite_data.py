@@ -10,7 +10,8 @@ def get_satellite_data(properties: dict, roi: ee.Geometry, date_range) -> ee.Ima
             'single_orbit_mosaic': sentinel1.single_orbit_mean
         },
         'sentinel2toa': {
-            'simple_cloud_free_mosaic': sentinel2toa.cloud_free_mosaic
+            'simple_cloud_free_mosaic': sentinel2toa.cloud_free_mosaic,
+            'least_cloudy_scene': sentinel2toa.least_cloudy_scene
         },
         'sentinel2sr': {
             'simple_cloud_free_mosaic': None

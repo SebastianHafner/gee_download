@@ -65,3 +65,56 @@ def cloud_free_mosaic(patch: ee.Geometry, date_range) -> ee.Image:
     final = ee.ImageCollection([cloud_free_mosaic, best_local, best]).mosaic()
 
     return final
+
+
+def add_patch_coverage(img: ee.Image) -> ee.Image:
+    img_footprint = ee.Algorithms.GeometryConstructors.Polygon(
+        ee.Geometry(img.get('system:footprint')).coordinates()
+    )
+
+    patch = ee.Geometry(img.get('patch'))
+    patch_area = patch.area(0.001)
+
+    intersection_poly = patch.intersection(img_footprint, ee.ErrorMargin(0.001))
+    intersection_area = intersection_poly.area(0.001)
+    coverage = ee.Number(intersection_area).divide(patch_area)
+
+    img = img.set('patchCoverage', coverage)
+    return img
+
+
+def add_cloud_score(img: ee.Image) -> ee.Image:
+    patch = ee.Geometry(img.get('patch'))
+    cloud_probability = ee.Image(img.get('cloudProbability'))
+    stats = cloud_probability.select('probability').reduceRegion(reducer=ee.Reducer.sum(),
+                                                                 geometry=patch,
+                                                                 scale=10,
+                                                                 maxPixels=1e12)
+    cloud_score = stats.get('probability')
+    img = img.set('cloudScore', cloud_score)
+    return img
+
+
+# TODO: add logging for verbose == True
+def least_cloudy_scene(patch: ee.Geometry, date_range, verbose: bool = True) -> ee.Image:
+
+    criteria = ee.Filter.And(ee.Filter.bounds(patch), ee.Filter.date(date_range.start(), date_range.end()))
+
+    s2toa = ee.ImageCollection('COPERNICUS/S2') \
+        .filter(criteria) \
+        .map(lambda img: img.set('patch', patch))
+    s2clouds = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY') \
+        .filter(criteria)
+
+    join_condition = ee.Filter.equals(leftField='system:index', rightField='system:index')
+    s2toa = ee.Join.saveFirst('cloudProbability').apply(primary=s2toa,
+                                                        secondary=s2clouds,
+                                                        condition=join_condition)
+
+    s2toa = s2toa.map(add_patch_coverage).filterMetadata('patchCoverage', 'equals', 1)
+
+    s2toa = s2toa.map(add_cloud_score).sort('cloudScore')
+
+    return s2toa
+
+
