@@ -98,13 +98,13 @@ def add_cloud_score(img: ee.Image) -> ee.Image:
 # TODO: add logging for verbose == True
 def least_cloudy_scene(patch: ee.Geometry, date_range, verbose: bool = True) -> ee.Image:
 
-    criteria = ee.Filter.And(ee.Filter.bounds(patch), ee.Filter.date(date_range.start(), date_range.end()))
-
     s2toa = ee.ImageCollection('COPERNICUS/S2') \
-        .filter(criteria) \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(patch) \
         .map(lambda img: img.set('patch', patch))
     s2clouds = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY') \
-        .filter(criteria)
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(patch)
 
     join_condition = ee.Filter.equals(leftField='system:index', rightField='system:index')
     s2toa = ee.Join.saveFirst('cloudProbability').apply(primary=s2toa,

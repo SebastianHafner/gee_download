@@ -1,5 +1,5 @@
 import ee
-import utils
+from data_processing import utils
 
 
 def extract_building_footprints(cfg) -> ee.FeatureCollection:

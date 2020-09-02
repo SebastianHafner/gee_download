@@ -11,7 +11,7 @@ SATELLITE_DATA:
       BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
       PRODUCT: 'least_cloudy_scene'
       NORMALIZE: True
-      NORMALIZATION_BOUDNS: [0, 10_000]
+      NORMALIZATION_BOUNDS: [0, 10_000]
     - SENSOR: 'sentinel1'
       BANDS: ['VV', 'VH']
       PRODUCT: 'single_orbit_mosaic'
@@ -35,11 +35,11 @@ SAMPLING:
   MAX_SAMPLE_SIZE: 800
   NEIGHBORHOOD_SIZE: 50
   SEED: 7
-  PATH: 'C:/Users/hafne/urban_extraction/data/samples'
+  PATH: 'C:/Users/hafne/urban_extraction/data/new_samples'
 
 DOWNLOAD:
-  TYPE: '' # drive or cloud
-  BUCKET_NAME: 'gee_downloads_urban_extraction'
+  TYPE: 'cloud' # drive or cloud
+  BUCKET_NAME: 'urban_extraction'
   DRIVE_FOLDER: 'gee_downloads_urban_extraction'
   TABLE_FORMAT: 'GeoJSON'
   IMAGE_FORMAT: 'GeoTIFF'

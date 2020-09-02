@@ -3,7 +3,7 @@ import ee
 from download_manager import args
 from download_manager.config import config
 
-from data_processing import building_footprints, exports, utils
+from data_processing import building_footprints, utils
 
 
 def density_sampling(cfg, points: bool = True) -> ee.FeatureCollection:
