@@ -1,0 +1,11 @@
+_BASE_: "base.yaml"
+
+BUILDING_FOOTPRINTS:
+  PIXEL_PERCENTAGE: True
+  ASSETS: ['Bing/UnitedStates/Kansas', 'Bing/UnitedStates/Missouri']
+
+ROI:
+  ID: 'kansascity'
+  UTM_EPSG: 'EPSG:32615'
+  LNG_RANGE: [-95.08448695207736, -94.01331995988986]
+  LAT_RANGE: [38.713509920612175, 39.42359708041787]

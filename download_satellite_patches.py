@@ -26,15 +26,15 @@ if __name__ == '__main__':
 
     # loading sampling points
     features = utils.load_samples(cfg)
-    features = features[-1:]
     print(f'Number of patches: {len(features)}')
 
     for record in records:
         sensor = record['SENSOR']
+        processing_level = record['PROCESSING_LEVEL']
         product = record['PRODUCT']
         for i, feature in enumerate(features):
             patch_id = i + 1
-            print(f'{sensor} {product} Patch {patch_id}')
+            print(f'{sensor} {processing_level} {product} Patch {patch_id}')
 
             # creating patch from point coordinates
             patch = utils.feature2patch(cfg, feature)
@@ -73,6 +73,3 @@ if __name__ == '__main__':
                 )
 
             dl_task.start()
-
-            if i > 0:
-                break

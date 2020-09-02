@@ -26,7 +26,7 @@ if __name__ == '__main__':
     bbox = utils.extract_bbox(cfg)
     bbox = ee.FeatureCollection([ee.Feature(bbox)])
 
-    task = export.table_to_drive(fc=bbox, folder='gee_test_exports',
+    task = export.table_to_drive(fc=bbox, folder=cfg.DOWNLOAD.DRIVE_FOLDER,
                                  file_name=f'bbox_{cfg.ROI.ID}')
     task.start()
 

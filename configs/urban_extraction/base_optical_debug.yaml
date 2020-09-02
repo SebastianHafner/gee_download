@@ -13,12 +13,6 @@ SATELLITE_DATA:
       PRODUCT: 'least_cloudy_scene'
       NORMALIZE: True
       NORMALIZATION_BOUNDS: [0, 10_000]
-    - SENSOR: 'sentinel1'
-      PROCESSING_LEVEL: 'grd'
-      BANDS: ['VV', 'VH']
-      PRODUCT: 'single_orbit_mosaic'
-      NORMALIZE: True
-      NORMALIZATION_BOUNDS: [-25, 0]
 
 MICROSOFT_BUILDINGS:
   ID: 'buildings'

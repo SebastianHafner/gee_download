@@ -23,7 +23,6 @@ if __name__ == '__main__':
 
     # loading sampling points
     features = utils.load_samples(cfg)
-    features = features[-1:]
     print(f'Number of patches: {len(features)}')
 
     for i, feature in enumerate(features):
@@ -45,7 +44,7 @@ if __name__ == '__main__':
                 region=patch.getInfo()['coordinates'],
                 description=dl_desc,
                 bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                fileNamePrefix=f'{cfg.ROI.ID}/{cfg.MIRCOSOFT_BUILDINGS.ID}/{img_name}',
+                fileNamePrefix=f'{cfg.ROI.ID}/{cfg.MICROSOFT_BUILDINGS.ID}/{img_name}',
                 scale=cfg.PIXEL_SPACING,
                 crs=cfg.ROI.UTM_EPSG,
                 maxPixels=1e6,
@@ -67,3 +66,6 @@ if __name__ == '__main__':
             )
 
         dl_task.start()
+
+        if i > 0:
+            break
