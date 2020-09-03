@@ -2,7 +2,7 @@ _BASE_: "base.yaml"
 
 BUILDING_FOOTPRINTS:
   PIXEL_PERCENTAGE: True
-  ASSETS: ['Bing/Canada/Georgia']
+  ASSETS: ['Bing/UnitedStates/Georgia']
 
 ROI:
   ID: 'atlanta'

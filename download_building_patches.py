@@ -66,6 +66,3 @@ if __name__ == '__main__':
             )
 
         dl_task.start()
-
-        if i > 0:
-            break
