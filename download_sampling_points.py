@@ -30,18 +30,11 @@ def density_sampling(cfg, points: bool = True) -> ee.FeatureCollection:
     )
     print(sampling_region.getInfo())
 
-    building_percentage = building_footprints.get_building_percentage(cfg)
+    building_density = building_footprints.get_building_density(cfg)
 
-    kernel = ee.Kernel.square(ee.Number(cfg.SAMPLING.NEIGHBORHOOD_SIZE).divide(2))
-    urban_density = building_percentage.reduceNeighborhood(
-        reducer=ee.Reducer.mean(),
-        kernel=kernel,
-        optimization='boxcar'
-    ).rename('urbanDensity')
-
-    density_zones = urban_density.expression(
+    density_zones = building_density.expression(
         '(d <= 0.00001) ? 0 : (d <= 0.01) ? 1 : (d <= 0.1) ? 2 : 3',
-        {'d': urban_density}
+        {'d': building_density}
     ).rename('densityZone')
 
     sampling_points = density_zones.stratifiedSample(
@@ -78,6 +71,7 @@ if __name__ == '__main__':
 
     ee.Initialize()
 
+    # TODO: maybe include as arguments
     points = True
     samples = density_sampling(cfg, points=points)
     sample_name = 'points' if points else 'patches'

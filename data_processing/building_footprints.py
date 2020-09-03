@@ -43,6 +43,20 @@ def get_building_percentage(cfg) -> ee.Image:
     return building_percentage
 
 
+def get_building_density(cfg):
+
+    building_percentage = get_building_percentage(cfg)
+
+    kernel = ee.Kernel.square(ee.Number(cfg.SAMPLING.NEIGHBORHOOD_SIZE).divide(2))
+    building_density = building_percentage.reduceNeighborhood(
+        reducer=ee.Reducer.mean(),
+        kernel=kernel,
+        optimization='boxcar'
+    ).rename('buildingDensity')
+
+    return building_density
+
+
 def get_building_data(cfg) -> ee.Image:
 
     if cfg.BUILDING_FOOTPRINTS.PIXEL_PERCENTAGE:
