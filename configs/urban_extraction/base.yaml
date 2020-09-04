@@ -37,7 +37,7 @@ SAMPLING:
   MAX_SAMPLE_SIZE: 800
   NEIGHBORHOOD_SIZE: 50
   SEED: 7
-  PATH: 'C:/Users/hafne/urban_extraction/data/new_samples'
+  PATH: 'C:/Users/shafner/urban_extraction/data/samples'
 
 DOWNLOAD:
   TYPE: 'cloud' # drive or cloud
