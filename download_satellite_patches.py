@@ -6,6 +6,7 @@ from download_manager.config import config
 import satellite_data
 from data_processing import utils
 
+from tqdm import tqdm
 
 
 if __name__ == '__main__':
@@ -32,9 +33,10 @@ if __name__ == '__main__':
         sensor = record['SENSOR']
         processing_level = record['PROCESSING_LEVEL']
         product = record['PRODUCT']
-        for i, feature in enumerate(features):
+        print(f'{sensor} {processing_level} {product}')
+        for i, feature in enumerate(tqdm(features)):
             patch_id = i + 1
-            print(f'{sensor} {processing_level} {product} Patch {patch_id}')
+            # print(f'{sensor} {processing_level} {product} Patch {patch_id}')
 
             # creating patch from point coordinates
             patch = utils.feature2patch(cfg, feature)

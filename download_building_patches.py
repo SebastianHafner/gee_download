@@ -5,6 +5,8 @@ from download_manager.config import config
 
 from data_processing import building_footprints, utils
 
+from tqdm import tqdm
+
 if __name__ == '__main__':
 
     # setting up config based on parsed argument
@@ -25,9 +27,9 @@ if __name__ == '__main__':
     features = utils.load_samples(cfg)
     print(f'Number of patches: {len(features)}')
 
-    for i, feature in enumerate(features):
+    for i, feature in enumerate(tqdm(features)):
         patch_id = i + 1
-        print(f'{label_name} Patch {patch_id}')
+        # print(f'{label_name} Patch {patch_id}')
 
         # creating patch from point coordinates
         patch = utils.feature2patch(cfg, feature)
