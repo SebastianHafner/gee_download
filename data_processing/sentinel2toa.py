@@ -113,12 +113,12 @@ def least_cloudy_scene(patch: ee.Geometry, date_range, verbose: bool = True) -> 
 
     s2toa = s2toa.map(add_patch_coverage).filterMetadata('patchCoverage', 'equals', 1)
 
-    s2toa = s2toa.map(add_cloud_score).sort('cloudScore')
+    s2toa = s2toa.map(add_cloud_score)
+    s2toa = ee.ImageCollection(s2toa)
 
-    img = s2toa.first()
-
-    # TODO: remove this
-    # print(img.getInfo())
+    # TODO: old probably remove
+    # img = s2toa.sort('cloudScore').first()
+    img = s2toa.sort('cloudScore', False).mosaic()
 
     return img
 
