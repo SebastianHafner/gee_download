@@ -64,6 +64,8 @@ def cloud_free_mosaic(patch: ee.Geometry, date_range) -> ee.Image:
 
     final = ee.ImageCollection([cloud_free_mosaic, best_local, best]).mosaic()
 
+    final = final.unitScale(0, 10_000).clamp(0, 1)
+
     return final
 
 
@@ -119,6 +121,8 @@ def least_cloudy_scene(patch: ee.Geometry, date_range, verbose: bool = True) -> 
     # TODO: old probably remove
     # img = s2toa.sort('cloudScore').first()
     img = s2toa.sort('cloudScore', False).mosaic()
+
+    img = img.unitScale(0, 10_000).clamp(0, 1)
 
     return img
 

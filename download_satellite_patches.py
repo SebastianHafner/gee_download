@@ -23,17 +23,20 @@ if __name__ == '__main__':
     # getting region of interest and date range of satellite data
     ee.Initialize()
     roi = utils.extract_bbox(cfg)
-    date_range = utils.extract_date_range(cfg)
 
     # loading sampling points
     features = utils.load_samples(cfg)
     print(f'Number of patches: {len(features)}')
 
     for record in records:
+        # unpacking
         sensor = record['SENSOR']
         processing_level = record['PROCESSING_LEVEL']
         product = record['PRODUCT']
+        date_range = ee.DateRange(*record['DATE_RANGE'])
+
         print(f'{sensor} {processing_level} {product}')
+
         for i, feature in enumerate(tqdm(features)):
             patch_id = i + 1
             # print(f'{sensor} {processing_level} {product} Patch {patch_id}')
