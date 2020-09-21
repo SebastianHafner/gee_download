@@ -39,8 +39,6 @@ if __name__ == '__main__':
 
         for i, feature in enumerate(tqdm(features)):
             patch_id = i + 1
-            # print(f'{sensor} {processing_level} {product} Patch {patch_id}')
-
             # creating patch from point coordinates
             patch = utils.feature2patch(cfg, feature)
 
