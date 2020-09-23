@@ -140,4 +140,25 @@ if __name__ == '__main__':
             maxPixels=1e6,
             fileFormat='GeoTIFF'
         )
+        # dl_task.start()
+
+        dsm = ee.Image("JAXA/ALOS/AW3D30/V2_2").select(['AVE_DSM'], ['Elevation']).float()
+        dsm = dsm.unitScale(-1000, 9000).clamp(0, 1).unmask().float()
+
+        img_name = f'dsm_{aoi_id}'
+
+        dl_desc = f'{aoi_id}DSMDownload'
+
+        dl_task = ee.batch.Export.image.toCloudStorage(
+            image=dsm,
+            region=bbox.getInfo()['coordinates'],
+            description=dl_desc,
+            bucket=cfg.DOWNLOAD.BUCKET_NAME,
+            fileNamePrefix=f'sn7/dsm/{img_name}',
+            scale=cfg.PIXEL_SPACING,
+            crs=epsg,
+            maxPixels=1e6,
+            fileFormat='GeoTIFF'
+        )
         dl_task.start()
+
