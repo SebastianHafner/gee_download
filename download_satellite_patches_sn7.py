@@ -41,13 +41,11 @@ def epsg_utm(bbox):
     return f'EPSG:326{zone_number}' if lat > 0 else f'EPSG:327{zone_number}'
 
 
-def building_footprint_features(aoi_id, year, month):
+def building_footprint_features(aoi_id: str, year: int, month: int):
     root_path = SPACENET7_PATH / aoi_id
     label_folder = root_path / 'labels_match'
     label_file = label_folder / f'global_monthly_{year}_{month:02d}_mosaic_{aoi_id}_Buildings.geojson'
-
-    with open(str(label_file)) as f:
-        label_data = json.load(f)
+    label_data = utils.load_json(label_file)
 
     features = label_data['features']
     new_features = []
@@ -72,15 +70,14 @@ if __name__ == '__main__':
     ee.Initialize()
 
     # getting metadata from csv file
-    metadata_file = SPACENET7_PATH.parent / 'sn7_metadata.csv'
+    metadata_file = SPACENET7_PATH.parent / 'sn7_metadata_v3.csv'
     metadata = pd.read_csv(metadata_file)
 
     for index, row in metadata.iterrows():
         aoi_id = str(row['aoi_id'])
         year = int(row['year'])
         month = int(row['month'])
-        clouds = int(row['clouds'])
-        print(index, f'aoi_id: {aoi_id} - year: {year} - month: {month:02d} - clouds: {clouds}')
+        quality = int(row['quality'])
 
         # getting bounding box of area of interest
         bbox = bounding_box(aoi_id)
@@ -90,31 +87,34 @@ if __name__ == '__main__':
         end_date = f'{year}-{month:02d}-{days}'
         date_range = ee.DateRange(start_date, end_date)
 
-        # download satellite data
-        for record in records:
-            sensor = record['SENSOR']
-            processing_level = record['PROCESSING_LEVEL']
-            product = record['PRODUCT']
+        if quality != 3:
+            print(index, f'aoi_id: {aoi_id} - year: {year} - month: {month:02d} - quality: {quality}')
 
-            # downloading satellite data according to properties specified in record
-            img = satellite_data.get_satellite_data(record, bbox, date_range)
-            img_name = f'{sensor}_{aoi_id}'
+            # download satellite data
+            for record in records:
+                sensor = record['SENSOR']
+                processing_level = record['PROCESSING_LEVEL']
+                product = record['PRODUCT']
+                if sensor == 'sentinel2':
+                    # downloading satellite data according to properties specified in record
+                    img = satellite_data.get_satellite_data(record, bbox, date_range)
+                    img_name = f'{sensor}_{aoi_id}'
 
-            dl_desc = f'{aoi_id}{sensor.capitalize()}Download'
+                    dl_desc = f'{aoi_id}{sensor.capitalize()}Download'
 
-            dl_task = ee.batch.Export.image.toCloudStorage(
-                image=img,
-                region=bbox.getInfo()['coordinates'],
-                description=dl_desc,
-                bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                fileNamePrefix=f'sn7/{sensor}/{img_name}',
-                scale=cfg.PIXEL_SPACING,
-                crs=epsg,
-                maxPixels=1e6,
-                fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
-            )
+                    dl_task = ee.batch.Export.image.toCloudStorage(
+                        image=img,
+                        region=bbox.getInfo()['coordinates'],
+                        description=dl_desc,
+                        bucket=cfg.DOWNLOAD.BUCKET_NAME,
+                        fileNamePrefix=f'sn7/{sensor}/{img_name}',
+                        scale=cfg.PIXEL_SPACING,
+                        crs=epsg,
+                        maxPixels=1e6,
+                        fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+                    )
 
-            # dl_task.start()
+                    dl_task.start()
 
         building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_buildings')
         building_footprints = building_footprints.filterBounds(bbox)
@@ -160,5 +160,5 @@ if __name__ == '__main__':
             maxPixels=1e6,
             fileFormat='GeoTIFF'
         )
-        dl_task.start()
+        # dl_task.start()
 

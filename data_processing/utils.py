@@ -94,5 +94,9 @@ def write_tif(file: Path, arr, transform, crs):
             dst.write(arr[:, :, i], i + 1)
 
 
+def load_json(file: Path):
+    with open(str(file)) as f:
+        d = json.load(f)
+    return d
 
 
