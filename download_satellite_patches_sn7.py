@@ -87,34 +87,35 @@ if __name__ == '__main__':
         end_date = f'{year}-{month:02d}-{days}'
         date_range = ee.DateRange(start_date, end_date)
 
-        if quality != 3:
-            print(index, f'aoi_id: {aoi_id} - year: {year} - month: {month:02d} - quality: {quality}')
+        print(index, f'aoi_id: {aoi_id} - year: {year} - month: {month:02d} - quality: {quality}')
 
-            # download satellite data
-            for record in records:
-                sensor = record['SENSOR']
-                processing_level = record['PROCESSING_LEVEL']
-                product = record['PRODUCT']
-                if sensor == 'sentinel2':
-                    # downloading satellite data according to properties specified in record
-                    img = satellite_data.get_satellite_data(record, bbox, date_range)
-                    img_name = f'{sensor}_{aoi_id}'
+        # download satellite data
+        for record in records:
+            sensor = record['SENSOR']
+            processing_level = record['PROCESSING_LEVEL']
+            product = record['PRODUCT']
 
-                    dl_desc = f'{aoi_id}{sensor.capitalize()}Download'
+            if sensor == 'sentinel1':
 
-                    dl_task = ee.batch.Export.image.toCloudStorage(
-                        image=img,
-                        region=bbox.getInfo()['coordinates'],
-                        description=dl_desc,
-                        bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                        fileNamePrefix=f'sn7/{sensor}/{img_name}',
-                        scale=cfg.PIXEL_SPACING,
-                        crs=epsg,
-                        maxPixels=1e6,
-                        fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
-                    )
+                # downloading satellite data according to properties specified in record
+                img = satellite_data.get_satellite_data(record, bbox, date_range)
+                img_name = f'{sensor}_{aoi_id}'
 
-                    dl_task.start()
+                dl_desc = f'{aoi_id}{sensor.capitalize()}Download'
+
+                dl_task = ee.batch.Export.image.toCloudStorage(
+                    image=img,
+                    region=bbox.getInfo()['coordinates'],
+                    description=dl_desc,
+                    bucket=cfg.DOWNLOAD.BUCKET_NAME,
+                    fileNamePrefix=f'sn7/{sensor}/{img_name}',
+                    scale=cfg.PIXEL_SPACING,
+                    crs=epsg,
+                    maxPixels=1e6,
+                    fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+                )
+
+                dl_task.start()
 
         building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_buildings')
         building_footprints = building_footprints.filterBounds(bbox)
@@ -140,7 +141,7 @@ if __name__ == '__main__':
             maxPixels=1e6,
             fileFormat='GeoTIFF'
         )
-        # dl_task.start()
+        dl_task.start()
 
         dsm = ee.Image("JAXA/ALOS/AW3D30/V2_2").select(['AVE_DSM'], ['Elevation']).float()
         dsm = dsm.unitScale(-1000, 9000).clamp(0, 1).unmask().float()
