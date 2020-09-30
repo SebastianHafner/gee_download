@@ -94,6 +94,7 @@ if __name__ == '__main__':
             sensor = record['SENSOR']
             processing_level = record['PROCESSING_LEVEL']
             product = record['PRODUCT']
+            date_range = date_range if sensor == 'sentinel1' else ee.DateRange('2019-01-01', '2019-12-31')
 
             if sensor == 'sentinel1':
 
@@ -141,7 +142,7 @@ if __name__ == '__main__':
             maxPixels=1e6,
             fileFormat='GeoTIFF'
         )
-        dl_task.start()
+        # dl_task.start()
 
         dsm = ee.Image("JAXA/ALOS/AW3D30/V2_2").select(['AVE_DSM'], ['Elevation']).float()
         dsm = dsm.unitScale(-1000, 9000).clamp(0, 1).unmask().float()
