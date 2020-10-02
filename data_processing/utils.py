@@ -100,3 +100,24 @@ def load_json(file: Path):
     return d
 
 
+def offset_months(year: int, month: int, dt: int):
+    months = year * 12 + month + dt
+    new_year = months // 12
+    new_month = months % 12
+    if new_month == 0:
+        new_month = 12
+        new_year -= 1
+    return new_year, new_month
+
+
+def month_days(month: int) -> int:
+    days = 31 if month in [1, 3, 5, 7, 8, 10, 12] else 30
+    return days if not month == 2 else 28
+
+
+if __name__ == '__main__':
+    year = 2019
+    month = 6
+    offset = 6
+    new_year, new_month = offset_months(year, month, offset)
+    print(f'{new_year} {new_month}')

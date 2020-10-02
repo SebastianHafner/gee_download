@@ -82,10 +82,6 @@ if __name__ == '__main__':
         # getting bounding box of area of interest
         bbox = bounding_box(aoi_id)
         epsg = epsg_utm(bbox)
-        start_date = f'{year}-{month:02d}-01'
-        days = 31 if month in [1, 3, 5, 7, 8, 10, 12] else 30
-        end_date = f'{year}-{month:02d}-{days}'
-        date_range = ee.DateRange(start_date, end_date)
 
         print(index, f'aoi_id: {aoi_id} - year: {year} - month: {month:02d} - quality: {quality}')
 
@@ -94,7 +90,17 @@ if __name__ == '__main__':
             sensor = record['SENSOR']
             processing_level = record['PROCESSING_LEVEL']
             product = record['PRODUCT']
-            date_range = date_range if sensor == 'sentinel1' else ee.DateRange('2019-01-01', '2019-12-31')
+
+            if sensor == 'sentinel2':
+                start_date = f'{year}-{month:02d}-01'
+                end_date = f'{year}-{month:02d}-{utils.month_days(month)}'
+                date_range = ee.DateRange(start_date, end_date)
+            else:
+                start_year, start_month = utils.offset_months(year, month, -5)
+                start_date = f'{start_year}-{start_month:02d}-01'
+                end_year, end_month = utils.offset_months(year, month, 6)
+                end_date = f'{end_year}-{end_month:02d}-{utils.month_days(end_month)}'
+                date_range = ee.DateRange(start_date, end_date)
 
             if sensor == 'sentinel1':
 
@@ -116,7 +122,7 @@ if __name__ == '__main__':
                     fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
                 )
 
-                dl_task.start()
+                # dl_task.start()
 
         building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_buildings')
         building_footprints = building_footprints.filterBounds(bbox)
@@ -143,6 +149,33 @@ if __name__ == '__main__':
             fileFormat='GeoTIFF'
         )
         # dl_task.start()
+
+        # building_footprints = building_footprints.filterMetadata('stable', 'equals', 1)
+        building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_reference_buildings')
+        building_footprints = building_footprints.filterBounds(bbox)
+        buildings = bf.rasterize(building_footprints, 'buildings')
+        building_percentage = buildings \
+            .reproject(crs=epsg, scale=1) \
+            .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
+            .reproject(crs=epsg, scale=cfg.PIXEL_SPACING) \
+            .rename('buildingPercentage')
+
+        img_name = f'buildings_{aoi_id}'
+
+        dl_desc = f'{aoi_id}BuildingsDownload'
+
+        dl_task = ee.batch.Export.image.toCloudStorage(
+            image=building_percentage,
+            region=bbox.getInfo()['coordinates'],
+            description=dl_desc,
+            bucket=cfg.DOWNLOAD.BUCKET_NAME,
+            fileNamePrefix=f'sn7/reference_buildings/{img_name}',
+            scale=cfg.PIXEL_SPACING,
+            crs=epsg,
+            maxPixels=1e6,
+            fileFormat='GeoTIFF'
+        )
+        dl_task.start()
 
         dsm = ee.Image("JAXA/ALOS/AW3D30/V2_2").select(['AVE_DSM'], ['Elevation']).float()
         dsm = dsm.unitScale(-1000, 9000).clamp(0, 1).unmask().float()
