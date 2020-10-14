@@ -21,7 +21,6 @@ if __name__ == '__main__':
     # getting region of interest and date range of satellite data
     ee.Initialize()
     roi = utils.extract_bbox(cfg)
-    date_range = utils.extract_date_range(cfg)
 
     # loading sampling points
     features = utils.load_samples(cfg)

@@ -1,0 +1,45 @@
+GEE_USERNAME: 'hafnersailing'
+
+PIXEL_SPACING: 10
+CRS: 'UTM'
+ERROR_MARGIN: 0.01
+
+SATELLITE_DATA:
+  RECORDS:
+    - SENSOR: 'sentinel2'
+      PROCESSING_LEVEL: 'sr'
+      BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+      PRODUCT: 'least_cloudy_mosaic'
+      DATE_RANGE: ['2019-05-01', '2019-08-31']
+    - SENSOR: 'sentinel1'
+      PROCESSING_LEVEL: 'grd'
+      BANDS: ['VV_mean', 'VV_stdDev', 'VH_mean', 'VH_stdDev']
+      PRODUCT: 'single_orbit_mosaic_temporal'
+      DATE_RANGE: ['2019-01-01', '2019-12-31']
+
+
+BUILDING_FOOTPRINTS:
+  ID: 'buildings'
+  PIXEL_PERCENTAGE: True
+  ASSETS: ['Stockholm/real_estate_data']
+
+ROI:
+  ID: 'stockholm'
+  UTM_EPSG: 'EPSG:32634'
+  LNG_RANGE: [17.768578980113826, 18.32476184144195]
+  LAT_RANGE: [59.21645604838177, 59.46017113057751]
+
+SAMPLING:
+  PATCH_SIZE: 256
+  SAMPLE_FRACTION: 0.3
+  MAX_SAMPLE_SIZE: 800
+  NEIGHBORHOOD_SIZE: 50
+  SEED: 7
+  PATH: 'C:/Users/shafner/urban_extraction/data/samples'
+
+DOWNLOAD:
+  TYPE: 'dive' # drive or cloud
+  BUCKET_NAME: 'urban_extraction_dataset'
+  DRIVE_FOLDER: 'gee_urban_extraction_poster'
+  TABLE_FORMAT: 'GeoJSON'
+  IMAGE_FORMAT: 'GeoTIFF'
