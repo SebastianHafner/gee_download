@@ -7,15 +7,15 @@ ERROR_MARGIN: 0.01
 SATELLITE_DATA:
   RECORDS:
     - SENSOR: 'sentinel2'
-      PROCESSING_LEVEL: 'sr'
+      PROCESSING_LEVEL: 'toa'
       BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
-      PRODUCT: 'least_cloudy_scene'
-      DATE_RANGE: ['2019-05-01', '2019-08-31']
+      PRODUCT: 'cloud_free_mosaic'
+      DATE_RANGE: ['2018-06-01', '2018-09-01']
     - SENSOR: 'sentinel1'
       PROCESSING_LEVEL: 'grd'
-      BANDS: ['VV_mean', 'VV_stdDev', 'VH_mean', 'VH_stdDev']
-      PRODUCT: 'single_orbit_mosaic_temporal'
-      DATE_RANGE: ['2019-01-01', '2019-12-31']
+      BANDS: ['VV', 'VH']
+      PRODUCT: 'single_orbit_mosaic'
+      DATE_RANGE: ['2018-06-01', '2018-09-01']
 
 MICROSOFT_BUILDINGS:
   ID: 'buildings'
@@ -38,7 +38,7 @@ SAMPLING:
 
 DOWNLOAD:
   TYPE: 'cloud' # drive or cloud
-  BUCKET_NAME: 'urban_extraction_dataset'
+  BUCKET_NAME: 'urban_extraction_dataset_version4'
   DRIVE_FOLDER: 'gee_downloads_urban_extraction'
   TABLE_FORMAT: 'GeoJSON'
   IMAGE_FORMAT: 'GeoTIFF'

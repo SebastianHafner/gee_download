@@ -8,7 +8,7 @@ def single_orbit_mean(patch: ee.Geometry, date_range) -> ee.Image:
         .filterBounds(patch) \
         .filterDate(date_range.start(), date_range.end()) \
         .filterMetadata('instrumentMode', 'equals', 'IW') \
-        .select(['VV', 'VH'])
+        .filterMetadata('transmitterReceiverPolarisation', 'equals', ['VV', 'VH'])
 
     # masking noise
     col = col.map(lambda img: img.updateMask(img.gte(-25)))

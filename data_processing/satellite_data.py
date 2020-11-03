@@ -1,5 +1,5 @@
 import ee
-from data_processing import sentinel1, sentinel2toa, sentinel2sr
+from data_processing import sentinel1, sentinel2toa, sentinel2sr, dlr_s2toa
 
 
 def get_satellite_data(properties: dict, roi: ee.Geometry, date_range) -> ee.Image:
@@ -13,7 +13,8 @@ def get_satellite_data(properties: dict, roi: ee.Geometry, date_range) -> ee.Ima
         'sentinel2': {
             'toa': {
                 'simple_cloud_free_mosaic': sentinel2toa.cloud_free_mosaic,
-                'least_cloudy_scene': sentinel2toa.least_cloudy_scene
+                'least_cloudy_scene': sentinel2toa.least_cloudy_scene,
+                'cloud_free_mosaic': dlr_s2toa.cloud_free_mosaic
             },
             'sr': {
                 'least_cloudy_scene': sentinel2sr.least_cloudy_scene,

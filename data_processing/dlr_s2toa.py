@@ -201,6 +201,7 @@ def cloud_free_mosaic(roi: ee.Geometry, date_range, cloud_free_keep_thresh: floa
 
     new_collection = ee.ImageCollection.fromImages([filtered, best.mosaic()])
     cloud_free = ee.Image(new_collection.mosaic()).float()
+    cloud_free = cloud_free.unitScale(0, 10_000).clamp(0, 1)
 
     return cloud_free
 
