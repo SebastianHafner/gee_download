@@ -38,32 +38,16 @@ if __name__ == '__main__':
 
         dl_desc = f'{dl_type.capitalize()}{label_name.capitalize()}DownloadPatch{patch_id}of{len(features)}'
 
-        if dl_type == 'cloud':
-
-            dl_task = ee.batch.Export.image.toCloudStorage(
-                image=img,
-                region=patch.getInfo()['coordinates'],
-                description=dl_desc,
-                bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                fileNamePrefix=f'{cfg.ROI.ID}/{cfg.MICROSOFT_BUILDINGS.ID}/{img_name}',
-                scale=cfg.PIXEL_SPACING,
-                crs=cfg.ROI.UTM_EPSG,
-                maxPixels=1e6,
-                fileFormat='GeoTIFF'
-            )
-
-        else:  # drive
-
-            dl_task = ee.batch.Export.image.toDrive(
-                image=img,
-                region=patch.getInfo()['coordinates'],
-                description=dl_desc,
-                folder=cfg.DOWNLOAD.DRIVE_FOLDER,
-                fileNamePrefix=img_name,
-                scale=cfg.PIXEL_SPACING,
-                crs=cfg.ROI.UTM_EPSG,
-                maxPixels=1e6,
-                fileFormat='GeoTIFF'
-            )
+        dl_task = ee.batch.Export.image.toCloudStorage(
+            image=img,
+            region=patch.getInfo()['coordinates'],
+            description=dl_desc,
+            bucket=cfg.DOWNLOAD.BUCKET_NAME,
+            fileNamePrefix=f'{cfg.ROI.ID}/{cfg.MICROSOFT_BUILDINGS.ID}/{img_name}',
+            scale=cfg.PIXEL_SPACING,
+            crs=cfg.ROI.UTM_EPSG,
+            maxPixels=1e6,
+            fileFormat='GeoTIFF'
+        )
 
         dl_task.start()

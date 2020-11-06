@@ -9,8 +9,8 @@ SATELLITE_DATA:
     - SENSOR: 'sentinel2'
       PROCESSING_LEVEL: 'toa'
       BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
-      PRODUCT: 'cloud_free_mosaic'
-      DATE_RANGE: ['2018-06-01', '2018-09-01']
+      PRODUCT: 'mostly_cloud_free_mosaic'
+      DATE_RANGE: ['2018-03-01', '2018-12-01']
     - SENSOR: 'sentinel1'
       PROCESSING_LEVEL: 'grd'
       BANDS: ['VV', 'VH']

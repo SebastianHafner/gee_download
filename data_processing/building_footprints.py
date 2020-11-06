@@ -2,15 +2,15 @@ import ee
 from data_processing import utils
 
 
-def extract_building_footprints(cfg) -> ee.FeatureCollection:
+def extract_building_footprints(cfg, roi) -> ee.FeatureCollection:
 
     building_footprints = ee.FeatureCollection([])
-    for asset_id in cfg.BUILDING_FOOTPRINTS.ASSETS:
+    for asset_id in roi['BUILDING_ASSETS']:
         asset = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/{asset_id}')
         building_footprints = building_footprints.merge(asset)
 
     # only consider building footprints intersecting bbox
-    bbox = utils.extract_bbox(cfg)
+    bbox = utils.extract_bbox(roi)
     building_footprints = building_footprints.filterBounds(bbox)
     # print(f'Found {building_footprints.size().getInfo()} intersecting building footprints')
 
@@ -65,3 +65,9 @@ def get_building_data(cfg) -> ee.Image:
         building_footprints = extract_building_footprints(cfg)
         buildings = rasterize(building_footprints, 'buildings')
         return buildings
+
+
+def get_building_mask(cfg, roi) -> ee.Image:
+    roi_id = roi['ID']
+    asset_id = f'users/{cfg.GEE_USERNAME}/building_masks/mask_{roi_id}'
+    return ee.Image(asset_id)

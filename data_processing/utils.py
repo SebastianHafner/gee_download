@@ -4,9 +4,9 @@ import rasterio
 from pathlib import Path
 
 
-def extract_bbox(cfg) -> ee.Geometry:
-    lng_min, lng_max = cfg.ROI.LNG_RANGE
-    lat_min, lat_max = cfg.ROI.LAT_RANGE
+def extract_bbox(roi) -> ee.Geometry:
+    lng_min, lng_max = roi['LNG_RANGE']
+    lat_min, lat_max = roi['LAT_RANGE']
     bbox = ee.Geometry.Rectangle([[lng_min, lat_min], [lng_max, lat_max]])
     # bbox = bbox.transform(proj=cfg.ROI.UTM_EPSG, maxError=cfg.ERROR_MARGIN)
     return bbox

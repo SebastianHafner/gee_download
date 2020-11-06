@@ -127,3 +127,23 @@ def least_cloudy_scene(patch: ee.Geometry, date_range, verbose: bool = True) -> 
     return img
 
 
+def mostly_cloud_free_mosaic(patch: ee.Geometry, date_range, verbose: bool = True) -> ee.Image:
+    s2 = ee.ImageCollection('COPERNICUS/S2') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(patch) \
+        .map(lambda img: img.set('patch', patch))
+    s2_clouds = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(patch)
+
+    join_condition = ee.Filter.equals(leftField='system:index', rightField='system:index')
+    s2 = ee.Join.saveFirst('cloudProbability').apply(primary=s2,
+                                                       secondary=s2_clouds,
+                                                       condition=join_condition)
+    s2 = s2.map(add_cloud_score)
+    s2 = ee.ImageCollection(s2)
+    img = s2.sort('cloudScore', False).mosaic()
+    img = img.unitScale(0, 10_000).clamp(0, 1)
+
+    return img
+
