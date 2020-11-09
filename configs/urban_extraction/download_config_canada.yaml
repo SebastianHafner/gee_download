@@ -1,0 +1,11 @@
+_BASE_: "download_config.yaml"
+
+ROIS_SUBSET: ['calgary', 'montreal', 'quebec', 'toronto', 'vancouver', 'winnipeg']
+
+SATELLITE_DATA:
+  RECORDS:
+    - SENSOR: 'sentinel2'
+      PROCESSING_LEVEL: 'toa'
+      BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+      PRODUCT: 'mostly_cloud_free_mosaic'
+      DATE_RANGE: ['2018-06-01', '2018-09-01']

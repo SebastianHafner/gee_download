@@ -35,16 +35,14 @@ if __name__ == '__main__':
                 product = record['PRODUCT']
                 date_range = ee.DateRange(*record['DATE_RANGE'])
 
-                print(f'{sensor} {processing_level} {product}')
-
                 img = satellite_data.get_satellite_data(record, bbox, date_range)
                 img = img.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                # mask = building_footprints.get_building_mask(cfg, roi)
-                # mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                # img = img.updateMask(mask)
+                mask = building_footprints.get_building_mask(cfg, roi)
+                mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
+                img = img.updateMask(mask)
                 img_name = f'{sensor}_{roi_id}_'
 
-                dl_desc = f'{cfg.ROI.ID}{sensor.capitalize()}{dl_type.capitalize()}'
+                dl_desc = f'{roi_id.capitalize()}{sensor.capitalize()}{dl_type.capitalize()}'
                 dl_task = ee.batch.Export.image.toCloudStorage(
                     image=img,
                     region=bbox.getInfo()['coordinates'],

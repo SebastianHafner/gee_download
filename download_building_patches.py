@@ -21,7 +21,7 @@ if __name__ == '__main__':
     ee.Initialize()
 
     for i, roi in enumerate(tqdm(cfg.ROIS)):
-        if i > 13:
+        if i >= 0:
             roi_id = roi['ID']
             epsg = roi['UTM_EPSG']
             if roi_id in cfg.ROIS_SUBSET:
@@ -33,7 +33,7 @@ if __name__ == '__main__':
                 img = img.updateMask(mask)
                 img_name = f'buildings_{roi_id}_'
 
-                dl_desc = f'{roi_id}buildings'
+                dl_desc = f'{roi_id.capitalize()}Buildings'
                 dl_task = ee.batch.Export.image.toCloudStorage(
                     image=img,
                     region=bbox.getInfo()['coordinates'],
