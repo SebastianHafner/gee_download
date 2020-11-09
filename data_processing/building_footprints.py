@@ -29,15 +29,15 @@ def rasterize(fc: ee.FeatureCollection, layer_name: str) -> ee.Image:
     return img
 
 
-def get_building_percentage(cfg) -> ee.Image:
+def get_building_percentage(cfg, roi) -> ee.Image:
 
-    building_footprints = extract_building_footprints(cfg)
+    building_footprints = extract_building_footprints(cfg, roi)
     buildings = rasterize(building_footprints, 'buildings')
-
+    epsg = roi['UTM_EPSG']
     building_percentage = buildings \
-        .reproject(crs=cfg.ROI.UTM_EPSG, scale=1) \
+        .reproject(crs=epsg, scale=1) \
         .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
-        .reproject(crs=cfg.ROI.UTM_EPSG, scale=cfg.PIXEL_SPACING) \
+        .reproject(crs=epsg, scale=cfg.PIXEL_SPACING) \
         .rename('buildingPercentage')
 
     return building_percentage
