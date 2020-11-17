@@ -17,7 +17,7 @@ def get_satellite_data(properties: dict, roi: ee.Geometry, date_range) -> ee.Ima
             },
             'sr': {
                 'least_cloudy_scene': sentinel2sr.least_cloudy_scene,
-                'least_cloudy_mosaic': sentinel2sr.least_cloudy_mosaic
+                'mostly_cloud_free_mosaic': sentinel2sr.mostly_cloud_free_mosaic
             }
         }
     }

@@ -1,0 +1,18 @@
+_BASE_: "base.yaml"
+
+BUILDING_FOOTPRINTS:
+  PIXEL_PERCENTAGE: True
+  ASSETS: []
+
+SATELLITE_DATA:
+  RECORDS:
+    - SENSOR: 'sentinel2'
+      PROCESSING_LEVEL: 'sr'
+      BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+      PRODUCT: 'mostly_cloud_free_mosaic'
+      DATE_RANGE: ['2019-05-01', '2019-08-31']
+    - SENSOR: 'sentinel1'
+      PROCESSING_LEVEL: 'grd'
+      BANDS: ['VV_mean', 'VV_stdDev', 'VH_mean', 'VH_stdDev']
+      PRODUCT: 'single_orbit_mosaic_temporal'
+      DATE_RANGE: ['2019-01-01', '2019-12-31']
