@@ -149,6 +149,7 @@ def mostly_cloud_free_mosaic(patch: ee.Geometry, date_range, verbose: bool = Tru
 
 
 def ghsl_composite(roi: ee.Geometry, date_range) -> ee.Image:
+
     s2 = ee.ImageCollection('COPERNICUS/S2') \
         .filterDate(date_range.start(), date_range.end()) \
         .filterBounds(roi) \
@@ -159,6 +160,38 @@ def ghsl_composite(roi: ee.Geometry, date_range) -> ee.Image:
 
     img = s2.reduce(ee.Reducer.percentile([25]))
     img = img.select(from_bands, to_bands)
+    img = img.unitScale(0, 10_000).clamp(0, 1)
+
+    return img
+
+
+def custom_composite(roi: ee.Geometry, date_range) -> ee.Image:
+
+    s2 = ee.ImageCollection('COPERNICUS/S2') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi)
+    s2_clouds = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi)
+
+    join_condition = ee.Filter.equals(leftField='system:index', rightField='system:index')
+    s2 = ee.Join.saveFirst('cloudProbability').apply(primary=s2,
+                                                     secondary=s2_clouds,
+                                                     condition=join_condition)
+
+    # masking clouds
+    MAX_CLOUD_PROBABILITY = 80
+    def mask_clouds(img: ee.Image) -> ee.Image:
+        no_clouds = ee.Image(img.get('cloudProbability')).lt(MAX_CLOUD_PROBABILITY)
+        return ee.Image(img).updateMask(no_clouds)
+    s2 = ee.ImageCollection(s2).map(mask_clouds)
+
+    # computing 25th percentile
+    img = s2.reduce(ee.Reducer.percentile([25]))
+    to_bands = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+    from_bands = [f'{band}_p25' for band in to_bands]
+    img = img.select(from_bands, to_bands)
+
     img = img.unitScale(0, 10_000).clamp(0, 1)
 
     return img

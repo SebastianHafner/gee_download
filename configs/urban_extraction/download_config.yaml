@@ -2,10 +2,7 @@ GEE_USERNAME: 'hafnersailing'
 PIXEL_SPACING: 10
 CRS: 'UTM'
 ERROR_MARGIN: 0.01
-ROIS_SUBSET: ['albuquerque', 'atlanta', 'calgary', 'charlston', 'chicago', 'columbus', 'dallas', 'daressalam',
-  'denver', 'elpaso', 'houston', 'kampala', 'kansascity', 'lasvegas', 'losangeles', 'miami', 'minneapolis', 'montreal',
-  'mwanza', 'newyork', 'phoenix', 'quebec', 'saltlakecity', 'sandiego', 'sanfrancisco', 'santafe', 'seattle',
-  'stgeorge', 'toronto', 'tucson', 'vancouver', 'winnipeg']
+ROIS_SUBSET: []
 
 SAMPLING:
   PATCH_SIZE: 256
@@ -17,7 +14,7 @@ SAMPLING:
 
 DOWNLOAD:
   TYPE: 'cloud' # drive or cloud
-  BUCKET_NAME: 'urban_extraction_ghsl'
+  BUCKET_NAME: 'urban_dataset'
   DRIVE_FOLDER: 'gee_downloads_urban_extraction'
   TABLE_FORMAT: 'GeoJSON'
   IMAGE_FORMAT: 'GeoTIFF'
@@ -32,7 +29,7 @@ SATELLITE_DATA:
     - SENSOR: 'sentinel2'
       PROCESSING_LEVEL: 'toa'
       BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
-      PRODUCT: 'ghsl_composite'
+      PRODUCT: 'custom_composite'
       DATE_RANGE: ['2016-01-01', '2016-12-31']
     - SENSOR: 'sentinel1'
       PROCESSING_LEVEL: 'grd'

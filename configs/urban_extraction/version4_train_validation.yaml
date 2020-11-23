@@ -1,6 +1,6 @@
 _BASE_: "download_config.yaml"
 
-ROIS_SUBSET: ['albuquerque', 'atlanta', 'calgary', 'charlston', 'chicago', 'columbus', 'dallas', 'daressalam',
-              'denver', 'elpaso', 'houston', 'kampala', 'kansascity', 'losangeles', 'miami', 'minneapolis', 'montreal',
-              'mwanza', 'newyork', 'phoenix', 'quebec', 'saltlakecity', 'sandiego', 'sanfrancisco', 'santafe', 'seattle',
-              'stgeorge', 'toronto', 'tucson', 'vancouver', 'winnipeg']
+ROIS_SUBSET: ['albuquerque', 'atlanta', 'calgary', 'charlston', 'columbus', 'dallas', 'denver', 'elpaso', 'houston',
+              'kansascity', 'lasvegas', 'losangeles', 'miami', 'minneapolis', 'montreal', 'newyork', 'phoenix',
+              'quebec', 'saltlakecity', 'sandiego', 'sanfrancisco', 'santafe', 'seattle', 'stgeorge', 'toronto',
+              'tucson', 'vancouver', 'winnipeg']
