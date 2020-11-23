@@ -147,3 +147,19 @@ def mostly_cloud_free_mosaic(patch: ee.Geometry, date_range, verbose: bool = Tru
 
     return img
 
+
+def ghsl_composite(roi: ee.Geometry, date_range) -> ee.Image:
+    s2 = ee.ImageCollection('COPERNICUS/S2') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi) \
+        .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE', 30))
+
+    to_bands = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+    from_bands = [f'{band}_p25' for band in to_bands]
+
+    img = s2.reduce(ee.Reducer.percentile([25]))
+    img = img.select(from_bands, to_bands)
+    img = img.unitScale(0, 10_000).clamp(0, 1)
+
+    return img
+

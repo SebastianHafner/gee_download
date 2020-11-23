@@ -37,9 +37,9 @@ if __name__ == '__main__':
 
                 img = satellite_data.get_satellite_data(record, bbox, date_range)
                 img = img.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                mask = building_footprints.get_building_mask(cfg, roi)
-                mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                img = img.updateMask(mask)
+                # mask = building_footprints.get_building_mask(cfg, roi)
+                # mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
+                # img = img.updateMask(mask)
                 img_name = f'{sensor}_{roi_id}_'
 
                 dl_desc = f'{roi_id.capitalize()}{sensor.capitalize()}{dl_type.capitalize()}'
