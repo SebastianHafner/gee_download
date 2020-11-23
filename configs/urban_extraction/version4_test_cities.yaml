@@ -1,4 +1,4 @@
 _BASE_: "download_config.yaml"
 
-ROIS_SUBSET: ['beijing', 'jakarta', 'kigali', 'lagos', 'mexicocity', 'milano', 'mumbai', 'riodejanairo', 'shanghai',
-              'stockholm', 'sidney']
+ROIS_SUBSET: ['beijing', 'jakarta', 'kairo', 'kigali', 'lagos', 'mexicocity', 'milano', 'mumbai', 'riodejanairo',
+              'shanghai', 'stockholm', 'sidney']

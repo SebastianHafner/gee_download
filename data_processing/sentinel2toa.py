@@ -186,11 +186,8 @@ def custom_composite(roi: ee.Geometry, date_range) -> ee.Image:
         return ee.Image(img).updateMask(no_clouds)
     s2 = ee.ImageCollection(s2).map(mask_clouds)
 
-    # computing 25th percentile
-    img = s2.reduce(ee.Reducer.percentile([25]))
-    to_bands = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
-    from_bands = [f'{band}_p25' for band in to_bands]
-    img = img.select(from_bands, to_bands)
+    # computing median
+    img = s2.median()
 
     img = img.unitScale(0, 10_000).clamp(0, 1)
 
