@@ -9,7 +9,7 @@ import ee
 import utm
 import pandas as pd
 
-SPACENET7_PATH = Path('C:/Users/hafne/urban_extraction/data/spacenet7/train')
+SPACENET7_PATH = Path('C:/Users/shafner/urban_extraction/data/spacenet7/train')
 
 
 def bounding_box(aoi_id: str):
@@ -115,7 +115,7 @@ if __name__ == '__main__':
                     fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
                 )
 
-                dl_task.start()
+                # dl_task.start()
 
             building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_buildings')
             building_footprints = building_footprints.filterBounds(bbox)
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 maxPixels=1e6,
                 fileFormat='GeoTIFF'
             )
-            dl_task.start()
+            # dl_task.start()
 
             # building_footprints = building_footprints.filterMetadata('stable', 'equals', 1)
             building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_reference_buildings')
@@ -189,4 +189,3 @@ if __name__ == '__main__':
                 fileFormat='GeoTIFF'
             )
             # dl_task.start()
-
