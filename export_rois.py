@@ -14,18 +14,55 @@ if __name__ == '__main__':
 
     ee.Initialize()
 
+    training = ['albuquerque', 'atlanta', 'charlston', 'columbus', 'dallas', 'denver', 'elpaso', 'houston',
+                'kansascity', 'lasvegas', 'losangeles', 'miami', 'minneapolis', 'montreal', 'phoenix', 'quebec',
+                'saltlakecity', 'sandiego', 'santafe', 'seattle', 'stgeorge', 'toronto', 'tucson', 'winnipeg']
+    validation = ['calgary', 'newyork', 'sanfrancisco', 'vancouver']
+    unlabeled = ['beijing', 'dakar', 'dubai', 'jakarta', 'kairo', 'kigali', 'lagos', 'mexicocity', 'mumbai',
+                 'riodejanairo', 'shanghai', 'buenosaires', 'bogota', 'sanjose', 'santiagodechile', 'kapstadt',
+                 'tripoli', 'freetown', 'london', 'madrid', 'kinshasa', 'manila', 'moscow', 'newdehli', 'nursultan',
+                 'perth', 'tokio', 'stockholm']
+
+    all_sites = training + validation + unlabeled
+
     features = []
+    point_features = []
     for roi in cfg.ROIS:
-        geom = utils.extract_bbox(roi)
-        feature = ee.Feature(geom, {'id': roi['ID'], 'labeled': roi['LABELED']})
-        features.append(feature)
+        site = roi['ID']
+        if site in all_sites:
+            if site in training:
+                dataset = 'training'
+            elif site in validation:
+                dataset = 'validation'
+            else:
+                dataset = 'unlabeled'
+            properties = {'id': roi['ID'], 'labeled': roi['LABELED'], 'dataset': dataset}
+
+
+            geom = utils.extract_bbox(roi)
+            feature = ee.Feature(geom, properties)
+            features.append(feature)
 
     fc = ee.FeatureCollection(features)
 
     dl_task = ee.batch.Export.table.toDrive(
         collection=fc,
-        description='rois',
+        description='sites',
         folder=cfg.DOWNLOAD.DRIVE_FOLDER,
-        fileNamePrefix='rois',
+        fileNamePrefix='sites',
         fileFormat=cfg.DOWNLOAD.TABLE_FORMAT
     )
+
+    dl_task.start()
+
+    fc_points = fc.map(lambda f: ee.Feature(f).centroid())
+
+    dl_task = ee.batch.Export.table.toDrive(
+        collection=fc_points,
+        description='sites_points',
+        folder=cfg.DOWNLOAD.DRIVE_FOLDER,
+        fileNamePrefix='sites_points',
+        fileFormat=cfg.DOWNLOAD.TABLE_FORMAT
+    )
+
+    dl_task.start()

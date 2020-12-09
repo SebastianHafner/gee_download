@@ -1,0 +1,4 @@
+_BASE_: "download_config.yaml"
+
+ROIS_SUBSET: ['buenosaires', 'bogota', 'sanjose', 'santiagodechile', 'kapstadt', 'tripoli', 'freetown',
+  'london', 'madrid', 'kinshasa', 'manila', 'moscow', 'newdehli', 'nursultan', 'perth', 'tokio']
