@@ -28,9 +28,9 @@ if __name__ == '__main__':
                 bbox = utils.extract_bbox(roi)
                 img = building_footprints.get_building_percentage(cfg, roi)
                 img = img.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                mask = building_footprints.get_building_mask(cfg, roi)
-                mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                img = img.updateMask(mask)
+                # mask = building_footprints.get_building_mask(cfg, roi)
+                # mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
+                # img = img.updateMask(mask)
                 img_name = f'buildings_{roi_id}_'
 
                 dl_desc = f'{roi_id.capitalize()}Buildings'

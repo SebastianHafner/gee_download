@@ -14,14 +14,9 @@ if __name__ == '__main__':
 
     ee.Initialize()
 
-    training = ['albuquerque', 'atlanta', 'charlston', 'columbus', 'dallas', 'denver', 'elpaso', 'houston',
-                'kansascity', 'lasvegas', 'losangeles', 'miami', 'minneapolis', 'montreal', 'phoenix', 'quebec',
-                'saltlakecity', 'sandiego', 'santafe', 'seattle', 'stgeorge', 'toronto', 'tucson', 'winnipeg']
-    validation = ['calgary', 'newyork', 'sanfrancisco', 'vancouver']
-    unlabeled = ['beijing', 'dakar', 'dubai', 'jakarta', 'kairo', 'kigali', 'lagos', 'mexicocity', 'mumbai',
-                 'riodejanairo', 'shanghai', 'buenosaires', 'bogota', 'sanjose', 'santiagodechile', 'kapstadt',
-                 'tripoli', 'freetown', 'london', 'madrid', 'kinshasa', 'manila', 'moscow', 'newdehli', 'nursultan',
-                 'perth', 'tokio', 'stockholm']
+    training = ['atlanta', 'dallas', 'denver', 'lasvegas', 'losangeles', 'seattle']
+    validation = ['newyork', 'sanfrancisco']
+    unlabeled = ['stockholm', 'daressalam', 'kampala', 'sidney']
 
     all_sites = training + validation + unlabeled
 
