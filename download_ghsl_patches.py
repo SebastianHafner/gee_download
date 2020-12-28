@@ -3,7 +3,7 @@ import ee
 from download_manager import args
 from download_manager.config import config
 
-from data_processing import building_footprints, utils
+from data_processing import ghsl, utils
 
 from tqdm import tqdm
 
@@ -21,31 +21,27 @@ if __name__ == '__main__':
     ee.Initialize()
 
     for i, roi in enumerate(tqdm(cfg.ROIS)):
-        if i >= 0:
-            roi_id = roi['ID']
-            epsg = roi['UTM_EPSG']
-            if roi_id in cfg.ROIS_SUBSET:
-                bbox = utils.extract_bbox(roi)
-                img = building_footprints.get_building_percentage(cfg, roi)
-                img = img.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                # mask = building_footprints.get_building_mask(cfg, roi)
-                # mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
-                # img = img.updateMask(mask)
-                img_name = f'ghsl_{roi_id}_'
+        roi_id = roi['ID']
+        epsg = roi['UTM_EPSG']
+        if roi_id in cfg.ROIS_SUBSET:
+            bbox = utils.extract_bbox(roi)
+            img = ghsl.get_ghsl()
+            img = img.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
+            img_name = f'ghsl_{roi_id}_'
 
-                dl_desc = f'{roi_id.capitalize()}Buildings'
-                dl_task = ee.batch.Export.image.toCloudStorage(
-                    image=img,
-                    region=bbox.getInfo()['coordinates'],
-                    description=dl_desc,
-                    bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                    fileNamePrefix=f'{roi_id}/ghsl/{img_name}',
-                    scale=cfg.PIXEL_SPACING,
-                    crs=epsg,
-                    fileDimensions=cfg.SAMPLING.PATCH_SIZE,
-                    maxPixels=1e12,
-                    skipEmptyTiles=True,
-                    fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
-                )
+            dl_desc = f'{roi_id.capitalize()}GHSL'
+            dl_task = ee.batch.Export.image.toCloudStorage(
+                image=img,
+                region=bbox.getInfo()['coordinates'],
+                description=dl_desc,
+                bucket=cfg.DOWNLOAD.BUCKET_NAME,
+                fileNamePrefix=f'{roi_id}/ghsl/{img_name}',
+                scale=cfg.PIXEL_SPACING,
+                crs=epsg,
+                fileDimensions=cfg.SAMPLING.PATCH_SIZE,
+                maxPixels=1e12,
+                skipEmptyTiles=True,
+                fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+            )
 
-                dl_task.start()
+            dl_task.start()

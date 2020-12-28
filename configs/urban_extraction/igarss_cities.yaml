@@ -1,0 +1,3 @@
+_BASE_: "download_config.yaml"
+
+ROIS_SUBSET: ['stockholm', 'daressalam', 'kampala', 'sidney']
