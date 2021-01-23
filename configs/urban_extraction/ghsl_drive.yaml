@@ -1,0 +1,17 @@
+_BASE_: "download_config.yaml"
+
+ROIS_SUBSET: ['nanning', 'wuhan', 'maputo', 'caracas', 'santacruzdelasierra', 'saopaulo', 'asuncion', 'lima',
+              'paramaribo', 'libreville', 'djibuti', 'beirut', 'baghdad', 'bischkek', 'athens', 'islamabad',
+              'hanoi', 'bangkok', 'dhaka', 'bengaluru', 'taipeh', 'guangzhou', 'chongqing', 'berlin', 'buenosaires',
+              'bogota', 'sanjose', 'santiagodechile', 'kapstadt', 'tripoli', 'freetown', 'london', 'madrid', 'istanbul',
+              'beijing', 'dakar', 'dubai', 'jakarta', 'kigali', 'kinshasa', 'lagos', 'manila', 'mexicocity', 'milano',
+              'moscow', 'mumbai', 'newdehli', 'nursultan', 'perth', 'riodejanairo', 'shanghai', 'stockholm', 'sidney',
+              'tokio', 'kairo', 'albuquerque', 'atlanta', 'calgary', 'charlston', 'chicago', 'columbus', 'dallas',
+              'daressalam', 'denver', 'elpaso', 'houston', 'kampala', 'kansascity', 'lasvegas', 'losangeles', 'miami',
+              'minneapolis', 'montreal', 'mwanza', 'newyork', 'phoenix', 'quebec', 'saltlakecity', 'sandiego',
+              'sanfrancisco', 'santafe', 'seattle', 'stgeorge', 'toronto', 'tucson', 'vancouver', 'winnipeg']
+
+DOWNLOAD:
+  TYPE: 'drive' # drive or cloud
+  BUCKET_NAME: 'urban_dataset'
+  DRIVE_FOLDER: 'ghsl2018'
