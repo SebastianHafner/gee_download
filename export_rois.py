@@ -14,9 +14,18 @@ if __name__ == '__main__':
 
     ee.Initialize()
 
-    training = ['atlanta', 'dallas', 'denver', 'lasvegas', 'losangeles', 'seattle']
-    validation = ['newyork', 'sanfrancisco']
-    unlabeled = ['stockholm', 'daressalam', 'kampala', 'sidney']
+    training = ['albuquerque', 'atlanta', 'charlston', 'columbus', 'dallas', 'denver', 'elpaso', 'houston',
+                'kansascity', 'lasvegas', 'losangeles', 'miami', 'minneapolis', 'montreal', 'phoenix', 'quebec',
+                'saltlakecity', 'sandiego', 'santafe', 'seattle', 'stgeorge', 'toronto', 'tucson', 'winnipeg']
+    validation = ['calgary', 'newyork', 'sanfrancisco', 'vancouver']
+    unlabeled = ['beijing', 'dakar', 'dubai', 'jakarta', 'kairo', 'kigali', 'lagos', 'mexicocity', 'mumbai',
+                 'riodejanairo', 'shanghai', 'buenosaires', 'bogota', 'sanjose', 'santiagodechile', 'kapstadt',
+                 'tripoli', 'freetown', 'london', 'madrid', 'kinshasa', 'manila', 'moscow', 'newdehli', 'nursultan',
+                 'perth', 'tokio', 'stockholm', 'sidney', 'maputo', 'caracas', 'santacruzdelasierra', 'saopaulo',
+                 'asuncion', 'lima', 'paramaribo', 'libreville', 'djibuti', 'beirut', 'baghdad', 'athens', 'islamabad',
+                 'hanoi', 'bangkok', 'dhaka', 'bengaluru', 'taipeh', 'berlin', 'nanning', 'wuhan', 'daressalam',
+                 'milano', 'zhengzhou', 'hefei', 'xian', 'seoul', 'ibadan', 'benincity', 'abidjan', 'accra',
+                 'amsterdam', 'riyadh', 'amman', 'damascus', 'nouakchott', 'prague']
 
     all_sites = training + validation + unlabeled
 
