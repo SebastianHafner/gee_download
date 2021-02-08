@@ -25,7 +25,8 @@ if __name__ == '__main__':
                  'asuncion', 'lima', 'paramaribo', 'libreville', 'djibuti', 'beirut', 'baghdad', 'athens', 'islamabad',
                  'hanoi', 'bangkok', 'dhaka', 'bengaluru', 'taipeh', 'berlin', 'nanning', 'wuhan', 'daressalam',
                  'milano', 'zhengzhou', 'hefei', 'xian', 'seoul', 'ibadan', 'benincity', 'abidjan', 'accra',
-                 'amsterdam', 'riyadh', 'amman', 'damascus', 'nouakchott', 'prague']
+                 'amsterdam', 'riyadh', 'amman', 'damascus', 'nouakchott', 'prague', 'sanaa', 'dahmar', 'kuwaitcity',
+                 'tindouf', 'tehran']
 
     all_sites = training + validation + unlabeled
 
