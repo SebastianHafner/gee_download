@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # setting up config based on parsed argument
     parser = args.argument_parser()
     args = parser.parse_known_args()[0]
-    cfg = config.setup(args, 'configs/urban_extraction')
+    cfg = config.setup(args, 'configs/spacenet7_s1s2')
 
     # extracting parameters from config
     records = cfg.SATELLITE_DATA.RECORDS
@@ -69,123 +69,72 @@ if __name__ == '__main__':
     ee.Initialize()
 
     # getting metadata from csv file
-    metadata_file = SPACENET7_PATH.parent / 'sn7_metadata_urban_dataset.csv'
+    metadata_file = Path(cfg.METADATA_FILE)
     metadata = pd.read_csv(metadata_file)
 
     for index, row in metadata.iterrows():
         aoi_id = str(row['aoi_id'])
         year = int(row['year'])
         month = int(row['month'])
-        quality = int(row['quality'])
+        mask = int(row['mask'])
 
         # getting bounding box of area of interest
         bbox = bounding_box(aoi_id)
         epsg = epsg_utm(bbox)
 
-        if quality != 3:
+        # download satellite data
+        for record in records:
+            sensor = record['SENSOR']
+            processing_level = record['PROCESSING_LEVEL']
+            product = record['PRODUCT']
 
-            print(index, f'aoi_id: {aoi_id} - year: {year} - month: {month:02d} - quality: {quality}')
+            start_date = f'{year}-{month:02d}-01'
+            end_year, end_month = utils.offset_months(year, month, 1)
+            end_date = f'{end_year}-{end_month:02d}-01'
+            date_range = ee.DateRange(start_date, end_date)
 
-            # download satellite data
-            for record in records:
-                sensor = record['SENSOR']
-                processing_level = record['PROCESSING_LEVEL']
-                product = record['PRODUCT']
+            # downloading satellite data according to properties specified in record
+            img = satellite_data.get_satellite_data(record, bbox, date_range)
+            img_name = f'{sensor}_{aoi_id}'
 
-                start_date = f'{year}-{month:02d}-01'
-                end_year, end_month = utils.offset_months(year, month, 1)
-                end_date = f'{end_year}-{end_month:02d}-01'
-                date_range = ee.DateRange(start_date, end_date)
-
-                # downloading satellite data according to properties specified in record
-                img = satellite_data.get_satellite_data(record, bbox, date_range)
-                img_name = f'{sensor}_{aoi_id}'
-
-                dl_desc = f'{aoi_id}{sensor.capitalize()}Download'
-
-                dl_task = ee.batch.Export.image.toCloudStorage(
-                    image=img,
-                    region=bbox.getInfo()['coordinates'],
-                    description=dl_desc,
-                    bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                    fileNamePrefix=f'sn7/{sensor}/{img_name}',
-                    scale=cfg.PIXEL_SPACING,
-                    crs=epsg,
-                    maxPixels=1e6,
-                    fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
-                )
-
-                # dl_task.start()
-
-            building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_buildings')
-            building_footprints = building_footprints.filterBounds(bbox)
-            buildings = bf.rasterize(building_footprints, 'buildings')
-            building_percentage = buildings \
-                .reproject(crs=epsg, scale=1) \
-                .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
-                .reproject(crs=epsg, scale=cfg.PIXEL_SPACING) \
-                .rename('buildingPercentage')
-
-            img_name = f'buildings_{aoi_id}'
-
-            dl_desc = f'{aoi_id}BuildingsDownload'
+            dl_desc = f'{aoi_id}{sensor.capitalize()}Download'
 
             dl_task = ee.batch.Export.image.toCloudStorage(
-                image=building_percentage,
+                image=img,
                 region=bbox.getInfo()['coordinates'],
                 description=dl_desc,
                 bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                fileNamePrefix=f'sn7/buildings/{img_name}',
+                fileNamePrefix=f'sn7/{sensor}/{img_name}',
                 scale=cfg.PIXEL_SPACING,
                 crs=epsg,
                 maxPixels=1e6,
-                fileFormat='GeoTIFF'
+                fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
             )
+
             # dl_task.start()
 
-            # building_footprints = building_footprints.filterMetadata('stable', 'equals', 1)
-            building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_reference_buildings')
-            building_footprints = building_footprints.filterBounds(bbox)
-            buildings = bf.rasterize(building_footprints, 'buildings')
-            building_percentage = buildings \
-                .reproject(crs=epsg, scale=1) \
-                .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
-                .reproject(crs=epsg, scale=cfg.PIXEL_SPACING) \
-                .rename('buildingPercentage')
+        building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/SN7/sn7_buildings')
+        building_footprints = building_footprints.filterBounds(bbox)
+        buildings = bf.rasterize(building_footprints, 'buildings')
+        building_percentage = buildings \
+            .reproject(crs=epsg, scale=1) \
+            .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
+            .reproject(crs=epsg, scale=cfg.PIXEL_SPACING) \
+            .rename('buildingPercentage')
 
-            img_name = f'buildings_{aoi_id}'
+        img_name = f'buildings_{aoi_id}'
 
-            dl_desc = f'{aoi_id}BuildingsDownload'
+        dl_desc = f'{aoi_id}BuildingsDownload'
 
-            dl_task = ee.batch.Export.image.toCloudStorage(
-                image=building_percentage,
-                region=bbox.getInfo()['coordinates'],
-                description=dl_desc,
-                bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                fileNamePrefix=f'sn7/reference_buildings/{img_name}',
-                scale=cfg.PIXEL_SPACING,
-                crs=epsg,
-                maxPixels=1e6,
-                fileFormat='GeoTIFF'
-            )
-            # dl_task.start()
-
-            dsm = ee.Image("JAXA/ALOS/AW3D30/V2_2").select(['AVE_DSM'], ['Elevation']).float()
-            dsm = dsm.unitScale(-1000, 9000).clamp(0, 1).unmask().float()
-
-            img_name = f'dsm_{aoi_id}'
-
-            dl_desc = f'{aoi_id}DSMDownload'
-
-            dl_task = ee.batch.Export.image.toCloudStorage(
-                image=dsm,
-                region=bbox.getInfo()['coordinates'],
-                description=dl_desc,
-                bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                fileNamePrefix=f'sn7/dsm/{img_name}',
-                scale=cfg.PIXEL_SPACING,
-                crs=epsg,
-                maxPixels=1e6,
-                fileFormat='GeoTIFF'
-            )
-            # dl_task.start()
+        dl_task = ee.batch.Export.image.toCloudStorage(
+            image=building_percentage,
+            region=bbox.getInfo()['coordinates'],
+            description=dl_desc,
+            bucket=cfg.DOWNLOAD.BUCKET_NAME,
+            fileNamePrefix=f'sn7/buildings/{img_name}',
+            scale=cfg.PIXEL_SPACING,
+            crs=epsg,
+            maxPixels=1e6,
+            fileFormat='GeoTIFF'
+        )
+        # dl_task.start()

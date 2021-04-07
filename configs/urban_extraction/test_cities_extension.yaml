@@ -1,3 +1,0 @@
-_BASE_: "download_config.yaml"
-
-ROIS_SUBSET: ['daressalam']
