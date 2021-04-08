@@ -79,67 +79,65 @@ if __name__ == '__main__':
         month = int(row['month'])
         mask = int(row['mask'])
 
-        if aoi_id == 'L15-0331E-1257N_1327_3160_13':
+        # getting bounding box of area of interest
+        bbox = bounding_box(aoi_id)
+        epsg = epsg_utm(bbox)
 
-            # getting bounding box of area of interest
-            bbox = bounding_box(aoi_id)
-            epsg = epsg_utm(bbox)
+        # download satellite data
+        for record in records:
+            sensor = record['SENSOR']
+            processing_level = record['PROCESSING_LEVEL']
+            product = record['PRODUCT']
 
-            # download satellite data
-            for record in records:
-                sensor = record['SENSOR']
-                processing_level = record['PROCESSING_LEVEL']
-                product = record['PRODUCT']
+            start_date = f'{year}-{month:02d}-01'
+            end_year, end_month = utils.offset_months(year, month, 1)
+            end_date = f'{end_year}-{end_month:02d}-01'
+            date_range = ee.DateRange(start_date, end_date)
 
-                start_date = f'{year}-{month:02d}-01'
-                end_year, end_month = utils.offset_months(year, month, 1)
-                end_date = f'{end_year}-{end_month:02d}-01'
-                date_range = ee.DateRange(start_date, end_date)
+            # downloading satellite data according to properties specified in record
+            img = satellite_data.get_satellite_data(record, bbox, date_range)
+            img_name = f'{sensor}_{aoi_id}_{year}_{month:02d}'
 
-                # downloading satellite data according to properties specified in record
-                img = satellite_data.get_satellite_data(record, bbox, date_range)
-                img_name = f'{sensor}_{aoi_id}_{year}_{month:02d}'
-
-                dl_desc = f'{aoi_id}{year}{month:02d}{sensor.capitalize()}Download'
-
-                dl_task = ee.batch.Export.image.toCloudStorage(
-                    image=img,
-                    region=bbox.getInfo()['coordinates'],
-                    description=dl_desc,
-                    bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                    fileNamePrefix=f'{aoi_id}/{sensor}/{img_name}',
-                    scale=cfg.PIXEL_SPACING,
-                    crs=epsg,
-                    maxPixels=1e6,
-                    fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
-                )
-
-                # dl_task.start()
-
-            building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/spacenet7/buildings_{aoi_id}')
-            building_footprints = building_footprints \
-                .filterMetadata('year', 'equals', year) \
-                .filterMetadata('month', 'equals', month)
-            buildings = bf.rasterize(building_footprints, 'buildings')
-            building_percentage = buildings \
-                .reproject(crs=epsg, scale=1) \
-                .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
-                .reproject(crs=epsg, scale=cfg.PIXEL_SPACING) \
-                .rename('buildingPercentage')
-
-            img_name = f'buildings_{aoi_id}_{year}_{month:02d}'
-
-            dl_desc = f'{aoi_id}BuildingsDownload'
+            dl_desc = f'{aoi_id}{year}{month:02d}{sensor.capitalize()}Download'
 
             dl_task = ee.batch.Export.image.toCloudStorage(
-                image=building_percentage,
+                image=img,
                 region=bbox.getInfo()['coordinates'],
                 description=dl_desc,
                 bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                fileNamePrefix=f'{aoi_id}/buildings/{img_name}',
+                fileNamePrefix=f'{aoi_id}/{sensor}/{img_name}',
                 scale=cfg.PIXEL_SPACING,
                 crs=epsg,
                 maxPixels=1e6,
-                fileFormat='GeoTIFF'
+                fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
             )
+
             dl_task.start()
+
+        building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/spacenet7/buildings_{aoi_id}')
+        building_footprints = building_footprints \
+            .filterMetadata('year', 'equals', year) \
+            .filterMetadata('month', 'equals', month)
+        buildings = bf.rasterize(building_footprints, 'buildings')
+        building_percentage = buildings \
+            .reproject(crs=epsg, scale=1) \
+            .reduceResolution(reducer=ee.Reducer.mean(), maxPixels=1000) \
+            .reproject(crs=epsg, scale=cfg.PIXEL_SPACING) \
+            .rename('buildingPercentage')
+
+        img_name = f'buildings_{aoi_id}_{year}_{month:02d}'
+
+        dl_desc = f'{aoi_id}BuildingsDownload'
+
+        dl_task = ee.batch.Export.image.toCloudStorage(
+            image=building_percentage,
+            region=bbox.getInfo()['coordinates'],
+            description=dl_desc,
+            bucket=cfg.DOWNLOAD.BUCKET_NAME,
+            fileNamePrefix=f'{aoi_id}/buildings/{img_name}',
+            scale=cfg.PIXEL_SPACING,
+            crs=epsg,
+            maxPixels=1e6,
+            fileFormat='GeoTIFF'
+        )
+        # dl_task.start()
