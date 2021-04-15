@@ -78,6 +78,7 @@ if __name__ == '__main__':
         year = int(row['year'])
         month = int(row['month'])
         mask = int(row['mask'])
+        print(f'{aoi_id} - {year} - {month:02d}')
 
         # getting bounding box of area of interest
         bbox = bounding_box(aoi_id)
@@ -112,12 +113,13 @@ if __name__ == '__main__':
                 fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
             )
 
-            dl_task.start()
+            # dl_task.start()
 
         building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/spacenet7/buildings_{aoi_id}')
         building_footprints = building_footprints \
             .filterMetadata('year', 'equals', year) \
             .filterMetadata('month', 'equals', month)
+        print(f'n buildings: {building_footprints.size().getInfo()}')
         buildings = bf.rasterize(building_footprints, 'buildings')
         building_percentage = buildings \
             .reproject(crs=epsg, scale=1) \
