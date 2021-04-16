@@ -97,6 +97,8 @@ if __name__ == '__main__':
 
             # downloading satellite data according to properties specified in record
             img = satellite_data.get_satellite_data(record, bbox, date_range)
+            if img is None:
+                continue
             img_name = f'{sensor}_{aoi_id}_{year}_{month:02d}'
 
             dl_desc = f'{aoi_id}{year}{month:02d}{sensor.capitalize()}Download'
