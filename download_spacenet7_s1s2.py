@@ -75,6 +75,8 @@ if __name__ == '__main__':
     for index, row in metadata.iterrows():
 
         aoi_id = str(row['aoi_id'])
+        if aoi_id == 'L15-1848E-0793N_7394_5018_13' or aoi_id == 'L15-0457E-1135N_1831_3648_13':
+            continue
         year = int(row['year'])
         month = int(row['month'])
         mask = int(row['mask'])
@@ -115,7 +117,7 @@ if __name__ == '__main__':
                 fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
             )
 
-            # dl_task.start()
+            dl_task.start()
 
         building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/spacenet7/buildings_{aoi_id}')
         building_footprints = building_footprints \
@@ -144,4 +146,4 @@ if __name__ == '__main__':
             maxPixels=1e6,
             fileFormat='GeoTIFF'
         )
-        # dl_task.start()
+        dl_task.start()

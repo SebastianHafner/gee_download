@@ -185,6 +185,10 @@ def custom_composite(roi: ee.Geometry, date_range) -> ee.Image:
         no_clouds = ee.Image(img.get('cloudProbability')).lt(MAX_CLOUD_PROBABILITY)
         return ee.Image(img).updateMask(no_clouds)
     s2 = ee.ImageCollection(s2).map(mask_clouds)
+    n = s2.size().getInfo()
+    print(f's2 images: {n}')
+    if n == 0:
+        return None
 
     # computing median
     img = s2.median()

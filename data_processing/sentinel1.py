@@ -18,6 +18,11 @@ def single_orbit_mean(patch: ee.Geometry, date_range) -> ee.Image:
     desc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'DESCENDING')
     col = ee.Algorithms.If(ee.Number(asc_col.size()).gt(desc_col.size()), asc_col, desc_col)
     col = ee.ImageCollection(col)
+    n = col.size().getInfo()
+    print(f's1 images: {n}')
+    if n == 0:
+        return None
+
 
     # getting distinct orbit numbers
     orbit_numbers = col \
