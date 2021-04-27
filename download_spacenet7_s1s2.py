@@ -75,7 +75,7 @@ if __name__ == '__main__':
     for index, row in metadata.iterrows():
 
         aoi_id = str(row['aoi_id'])
-        if aoi_id == 'L15-1848E-0793N_7394_5018_13' or aoi_id == 'L15-0457E-1135N_1831_3648_13':
+        if aoi_id not in cfg.AOI_SUBSET:
             continue
         year = int(row['year'])
         month = int(row['month'])
