@@ -4,7 +4,15 @@ CRS: 'UTM'
 ERROR_MARGIN: 0.01
 
 AOI_SUBSET: [
-  'nantes'
+  'paris',
+  'pisa',
+  'rennes',
+  'saclay_e',
+  'bordeaux',
+  'bercy',
+  'hongkong',
+  'aguasclaras',
+  'abudhabi',
 ]
 
 DOWNLOAD:
