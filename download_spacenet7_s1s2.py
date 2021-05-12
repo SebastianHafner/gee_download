@@ -10,6 +10,7 @@ import utm
 import pandas as pd
 
 SPACENET7_PATH = Path('C:/Users/shafner/urban_extraction/data/spacenet7/train')
+SPACENET7_PATH = Path('/storage/shafner/spacenet7/train')
 
 
 def bounding_box(aoi_id: str):
@@ -40,22 +41,6 @@ def epsg_utm(bbox):
     return f'EPSG:326{zone_number}' if lat > 0 else f'EPSG:327{zone_number}'
 
 
-def building_footprint_features(aoi_id: str, year: int, month: int):
-    root_path = SPACENET7_PATH / aoi_id
-    label_folder = root_path / 'labels_match'
-    label_file = label_folder / f'global_monthly_{year}_{month:02d}_mosaic_{aoi_id}_Buildings.geojson'
-    label_data = utils.load_json(label_file)
-
-    features = label_data['features']
-    new_features = []
-    for feature in features:
-        coords = feature['geometry']['coordinates']
-        geom = ee.Geometry.Polygon(coords, proj='EPSG:3857').transform('EPSG:4326')
-        new_feature = ee.Feature(geom)
-        new_features.append(new_feature)
-    return new_features
-
-
 if __name__ == '__main__':
 
     # setting up config based on parsed argument
@@ -71,12 +56,23 @@ if __name__ == '__main__':
     # getting metadata from csv file
     metadata_file = Path(cfg.METADATA_FILE)
     metadata = pd.read_csv(metadata_file)
+    download = False
 
     for index, row in metadata.iterrows():
 
         aoi_id = str(row['aoi_id'])
-        if aoi_id not in cfg.AOI_SUBSET:
+
+        # missing
+        if aoi_id in cfg.MISSING_AOIS:
             continue
+        # subset
+        if cfg.AOI_SUBSET and aoi_id not in cfg.AOI_SUBSET:
+            continue
+        if aoi_id == 'L15-0506E-1204N_2027_3374_13':
+            download = True
+        if download is False:
+            continue
+
         year = int(row['year'])
         month = int(row['month'])
         mask = int(row['mask'])
