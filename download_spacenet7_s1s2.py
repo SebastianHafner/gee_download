@@ -68,10 +68,6 @@ if __name__ == '__main__':
         # subset
         if cfg.AOI_SUBSET and aoi_id not in cfg.AOI_SUBSET:
             continue
-        if aoi_id == 'L15-0506E-1204N_2027_3374_13':
-            download = True
-        if download is False:
-            continue
 
         year = int(row['year'])
         month = int(row['month'])
