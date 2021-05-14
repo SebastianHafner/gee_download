@@ -109,7 +109,7 @@ if __name__ == '__main__':
                 fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
             )
 
-            dl_task.start()
+            # dl_task.start()
 
         building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/spacenet7/buildings_{aoi_id}')
         building_footprints = building_footprints \
@@ -133,6 +133,22 @@ if __name__ == '__main__':
             description=dl_desc,
             bucket=cfg.DOWNLOAD.BUCKET_NAME,
             fileNamePrefix=f'{aoi_id}/buildings/{img_name}',
+            scale=cfg.PIXEL_SPACING,
+            crs=epsg,
+            maxPixels=1e6,
+            fileFormat='GeoTIFF'
+        )
+        # dl_task.start()
+
+        masks = ee.Image(f'users/{cfg.GEE_USERNAME}/spacenet7/masks_{aoi_id}').unmask().uint8()
+        img_name = f'masks_{aoi_id}'
+        dl_desc = f'MasksDownload{aoi_id}'
+        dl_task = ee.batch.Export.image.toCloudStorage(
+            image=building_percentage,
+            region=bbox.getInfo()['coordinates'],
+            description=dl_desc,
+            bucket=cfg.DOWNLOAD.BUCKET_NAME,
+            fileNamePrefix=f'{aoi_id}/{img_name}',
             scale=cfg.PIXEL_SPACING,
             crs=epsg,
             maxPixels=1e6,
