@@ -84,7 +84,7 @@ if __name__ == '__main__':
                     fileNamePrefix=f'{aoi_id}/{sensor}/{img_name}',
                     scale=cfg.PIXEL_SPACING,
                     crs=EPSG,
-                    maxPixels=1e6,
+                    maxPixels=1e7,
                     fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
                 )
 
@@ -94,3 +94,19 @@ if __name__ == '__main__':
 
             if from_date.get('year').getInfo() == end_year and from_date.get('month').getInfo() == end_month:
                 break
+
+        change = ee.Image(f'users/{cfg.GEE_USERNAME}/oscd_dataset/change_{aoi_id}').unmask().uint8()
+        img_name = f'change_{aoi_id}'
+        dl_desc = f'Change{aoi_id}Download'
+        dl_task = ee.batch.Export.image.toCloudStorage(
+            image=change,
+            region=bbox.getInfo()['coordinates'],
+            description=dl_desc,
+            bucket=cfg.DOWNLOAD.BUCKET_NAME,
+            fileNamePrefix=f'{aoi_id}/change/{img_name}',
+            scale=cfg.PIXEL_SPACING,
+            crs=EPSG,
+            maxPixels=1e7,
+            fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+        )
+        dl_task.start()
