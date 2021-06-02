@@ -2,7 +2,7 @@ import ee
 from data_processing import sentinel1, sentinel2toa, sentinel2sr, dlr_s2toa
 
 
-def get_satellite_data(properties: dict, roi: ee.Geometry, date_range) -> ee.Image:
+def get_satellite_data(properties: dict, roi: ee.Geometry, date_range, orbit_number=None) -> ee.Image:
 
     # getting satellite data for record setting
     processing_functions = {
@@ -32,8 +32,10 @@ def get_satellite_data(properties: dict, roi: ee.Geometry, date_range) -> ee.Ima
     bands = properties['BANDS']
 
     func = processing_functions[sensor][processing_level][product]
-    img = func(roi, date_range)
-
+    if sensor == 'sentinel2':
+        img = func(roi, date_range)
+    else:
+        img = func(roi, date_range, orbit_number)
     img = ee.Image(img).select(bands)
     img = img.unmask().float()
 

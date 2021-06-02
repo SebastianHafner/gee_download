@@ -115,6 +115,12 @@ def month_days(month: int) -> int:
     return days if not month == 2 else 28
 
 
+def read_json(file: Path):
+    with open(str(file)) as f:
+        d = json.load(f)
+    return d
+
+
 if __name__ == '__main__':
     year = 2019
     month = 6

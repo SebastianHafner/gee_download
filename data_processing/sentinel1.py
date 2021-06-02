@@ -1,7 +1,7 @@
 import ee
 
 
-def single_orbit_mean(patch: ee.Geometry, date_range) -> ee.Image:
+def single_orbit_mean(patch: ee.Geometry, date_range, orbit_number: int = None) -> ee.Image:
 
     # sup-setting data
     col = ee.ImageCollection('COPERNICUS/S1_GRD') \
@@ -13,34 +13,37 @@ def single_orbit_mean(patch: ee.Geometry, date_range) -> ee.Image:
     # masking noise
     col = col.map(lambda img: img.updateMask(img.gte(-25)))
 
-    # using orbit with more scenes
-    asc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'ASCENDING')
-    desc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'DESCENDING')
-    col = ee.Algorithms.If(ee.Number(asc_col.size()).gt(desc_col.size()), asc_col, desc_col)
-    col = ee.ImageCollection(col)
-    n = col.size().getInfo()
-    print(f's1 images: {n}')
-    if n == 0:
-        return None
+    # using orbit with more scenes if no orbit number is passed
+    if orbit_number is None:
+        asc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'ASCENDING')
+        desc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'DESCENDING')
+        col = ee.Algorithms.If(ee.Number(asc_col.size()).gt(desc_col.size()), asc_col, desc_col)
+        col = ee.ImageCollection(col)
+        if col.size().getInfo():
+            return None
 
+        # getting distinct orbit numbers
+        orbit_numbers = col \
+            .toList(col.size()) \
+            .map(lambda img: ee.Number(ee.Image(img).get('relativeOrbitNumber_start'))) \
+            .distinct().getInfo()
 
-    # getting distinct orbit numbers
-    orbit_numbers = col \
-        .toList(col.size()) \
-        .map(lambda img: ee.Number(ee.Image(img).get('relativeOrbitNumber_start'))) \
-        .distinct().getInfo()
+        # computing separate mean backscatter image for each orbit number
+        means = ee.ImageCollection([])
+        for number in orbit_numbers:
+            mean = col.filterMetadata('relativeOrbitNumber_start', 'equals', number).mean()
+            means = means.merge(ee.ImageCollection([mean]))
 
-    # computing separate mean backscatter image for each orbit number
-    means = ee.ImageCollection([])
-    for number in orbit_numbers:
-        mean = col.filterMetadata('relativeOrbitNumber_start', 'equals', number).mean()
-        means = means.merge(ee.ImageCollection([mean]))
+        img = means.mosaic()
+    else:
+        col = col.filterMetadata('relativeOrbitNumber_start', 'equals', orbit_number)
+        if col.size().getInfo() == 0:
+            return None
+        img = col.mean()
 
-    mosaic = means.mosaic()
+    img = img.unitScale(-25, 0).clamp(0, 1)
 
-    mosaic = mosaic.unitScale(-25, 0).clamp(0, 1)
-
-    return mosaic
+    return img
 
 
 def single_orbit_metrics(patch: ee.Geometry, date_range) -> ee.Image:

@@ -1,0 +1,35 @@
+GEE_USERNAME: 'hafnersailing'
+PIXEL_SPACING: 10
+CRS: 'UTM'
+ERROR_MARGIN: 0.01
+
+METADATA_FILE: '/storage/shafner/spacenet7/sn7_timestamps.csv'
+
+SINGLE_S1_ORBIT: True
+S1_ORBITS_FILE: '/storage/shafner/spacenet7/sn7_orbit_numbers.json'
+
+AOI_SUBSET: []
+MISSING_AOIS: []
+
+DOWNLOAD:
+  TYPE: 'cloud' # drive or cloud
+  BUCKET_NAME: 'spacenet7_s1s2_dataset_v3'
+  DRIVE_FOLDER: 'spacenet7_s1s2_dataset_v3'
+  TABLE_FORMAT: 'GeoJSON'
+  IMAGE_FORMAT: 'GeoTIFF'
+
+MICROSOFT_BUILDINGS:
+  ID: 'buildings'
+  PIXEL_PERCENTAGE: True
+  ASSETS: []
+
+SATELLITE_DATA:
+  RECORDS:
+    - SENSOR: 'sentinel2'
+      PROCESSING_LEVEL: 'toa'
+      BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+      PRODUCT: 'mostly_cloud_free_mosaic'
+    - SENSOR: 'sentinel1'
+      PROCESSING_LEVEL: 'grd'
+      BANDS: ['VV', 'VH']
+      PRODUCT: 'single_orbit_mosaic'
