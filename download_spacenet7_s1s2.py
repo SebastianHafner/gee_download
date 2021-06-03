@@ -119,7 +119,7 @@ if __name__ == '__main__':
                     fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
                 )
 
-                # dl_task.start()
+                dl_task.start()
 
         building_footprints = ee.FeatureCollection(f'users/{cfg.GEE_USERNAME}/spacenet7/buildings_{aoi_id}')
         building_footprints = building_footprints \
@@ -148,7 +148,7 @@ if __name__ == '__main__':
             maxPixels=1e6,
             fileFormat='GeoTIFF'
         )
-        dl_task.start()
+        # dl_task.start()
 
         if aoi_id not in aoi_tracker and mask:
             masks = ee.Image(f'users/{cfg.GEE_USERNAME}/spacenet7/masks_{aoi_id}').unmask().uint8()
@@ -165,5 +165,5 @@ if __name__ == '__main__':
                 maxPixels=1e6,
                 fileFormat='GeoTIFF'
             )
-            dl_task.start()
+            # dl_task.start()
             aoi_tracker.append(aoi_id)
