@@ -9,7 +9,10 @@ SINGLE_S1_ORBIT: True
 S1_ORBITS_FILE: '/storage/shafner/spacenet7/sn7_orbit_numbers.json'
 
 AOI_SUBSET: []
-MISSING_AOIS: []
+MISSING_AOIS: [
+  "L15-0457E-1135N_1831_3648_13",
+  "L15-1848E-0793N_7394_5018_13"
+]
 
 DOWNLOAD:
   TYPE: 'cloud' # drive or cloud
