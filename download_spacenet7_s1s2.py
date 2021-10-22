@@ -107,12 +107,24 @@ if __name__ == '__main__':
 
                 dl_desc = f'{aoi_id}{year}{month:02d}{sensor.capitalize()}Download'
 
-                dl_task = ee.batch.Export.image.toCloudStorage(
+                # dl_task = ee.batch.Export.image.toCloudStorage(
+                #     image=img,
+                #     region=bbox.getInfo()['coordinates'],
+                #     description=dl_desc,
+                #     bucket=cfg.DOWNLOAD.BUCKET_NAME,
+                #     fileNamePrefix=f'{aoi_id}/{sensor}/{img_name}',
+                #     scale=cfg.PIXEL_SPACING,
+                #     crs=epsg,
+                #     maxPixels=1e6,
+                #     fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+                # )
+
+                dl_task = ee.batch.Export.image.toDrive(
                     image=img,
                     region=bbox.getInfo()['coordinates'],
                     description=dl_desc,
-                    bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                    fileNamePrefix=f'{aoi_id}/{sensor}/{img_name}',
+                    folder='spacenet7_correction',
+                    fileNamePrefix=img_name,
                     scale=cfg.PIXEL_SPACING,
                     crs=epsg,
                     maxPixels=1e6,
