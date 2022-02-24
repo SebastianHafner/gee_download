@@ -165,6 +165,54 @@ def ghsl_composite(roi: ee.Geometry, date_range) -> ee.Image:
     return img
 
 
+def add_cloudy_pixel_percentage(img: ee.Image) -> ee.Image:
+    roi = ee.Geometry(img.get('roi'))
+    roi_area = roi.area(0.001)
+
+    qa60 = img.select(['QA60'])
+    clouds = qa60.bitwiseAnd(1 << 10).Or(qa60.bitwiseAnd(1 << 11)).rename('clouds')
+    cloud_area_img = clouds.multiply(ee.Image.pixelArea())
+    stats = cloud_area_img.reduceRegion(
+        reducer=ee.Reducer.sum(),
+        geometry=roi,
+        scale=10,
+        maxPixels=1e12
+    )
+    cloud_area = stats.get('clouds')
+    cloud_pixel_percentage = ee.Number(cloud_area).divide(roi_area).multiply(100)
+    img = img.set('CLOUDY_PIXEL_PERCENTAGE_ROI', cloud_pixel_percentage)
+    return img
+
+
+def ghs_composite(roi: ee.Geometry, date_range) -> ee.Image:
+
+    s2 = ee.ImageCollection('COPERNICUS/S2') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi) \
+        .map(lambda img: img.set('roi', roi)) \
+        .map(add_cloudy_pixel_percentage) \
+        .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE_ROI', 2))
+
+    if not s2.size().getInfo() > 0:
+        s2 = ee.ImageCollection('COPERNICUS/S2') \
+            .filterDate(date_range.start().advance(-1, 'month'), date_range.end().advance(1, 'month')) \
+            .filterBounds(roi) \
+            .map(lambda img: img.set('roi', roi)) \
+            .map(add_cloudy_pixel_percentage) \
+            .filter(ee.Filter.lte('CLOUDY_PIXEL_PERCENTAGE_ROI', 2))
+
+    assert(s2.size().getInfo() > 0)
+
+    to_bands = ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+    from_bands = [f'{band}_p25' for band in to_bands]
+
+    img = s2.reduce(ee.Reducer.percentile([25]))
+    img = img.select(from_bands, to_bands)
+    img = img.unitScale(0, 10_000).clamp(0, 1)
+
+    return img
+
+
 def custom_composite(roi: ee.Geometry, date_range) -> ee.Image:
 
     s2 = ee.ImageCollection('COPERNICUS/S2') \

@@ -3,7 +3,7 @@ PIXEL_SPACING: 10
 PATCH_SIZE: 256
 CRS: 'UTM'
 ERROR_MARGIN: 0.01
-ROIS_SUBSET: ['mexicocity']
+ROIS_SUBSET: ['']
 
 DOWNLOAD:
   TYPE: 'drive' # drive or cloud

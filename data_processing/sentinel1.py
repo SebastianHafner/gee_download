@@ -12,14 +12,18 @@ def single_orbit_mean(patch: ee.Geometry, date_range, orbit_number: int = None) 
 
     # masking noise
     col = col.map(lambda img: img.updateMask(img.gte(-25)))
+    print(col.size().getInfo())
 
     # using orbit with more scenes if no orbit number is passed
     if orbit_number is None:
         asc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'ASCENDING')
+        # print('asc', asc_col.size().getInfo())
         desc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'DESCENDING')
+        # print('desc', desc_col.size().getInfo())
         col = ee.Algorithms.If(ee.Number(asc_col.size()).gt(desc_col.size()), asc_col, desc_col)
         col = ee.ImageCollection(col)
-        if col.size().getInfo():
+        # print(col.size().getInfo())
+        if col.size().getInfo() == 0:
             return None
 
         # getting distinct orbit numbers

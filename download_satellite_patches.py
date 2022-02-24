@@ -40,21 +40,34 @@ if __name__ == '__main__':
                 # mask = building_footprints.get_building_mask(cfg, roi)
                 # mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
                 # img = img.updateMask(mask)
-                img_name = f'{sensor}_{roi_id}_'
 
                 dl_desc = f'{roi_id.capitalize()}{sensor.capitalize()}{dl_type.capitalize()}'
-                dl_task = ee.batch.Export.image.toCloudStorage(
-                    image=img,
-                    region=bbox.getInfo()['coordinates'],
-                    description=dl_desc,
-                    bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                    fileNamePrefix=f'{roi_id}/{sensor}/{img_name}',
-                    scale=cfg.PIXEL_SPACING,
-                    crs=epsg,
-                    fileDimensions=cfg.SAMPLING.PATCH_SIZE,
-                    maxPixels=1e12,
-                    skipEmptyTiles=True,
-                    fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
-                )
+                if cfg.DOWNLOAD.TYPE == 'cloud':
+                    dl_task = ee.batch.Export.image.toCloudStorage(
+                        image=img,
+                        region=bbox.getInfo()['coordinates'],
+                        description=dl_desc,
+                        bucket=cfg.DOWNLOAD.BUCKET_NAME,
+                        fileNamePrefix=f'{roi_id}/{sensor}/{sensor}_{roi_id}_',
+                        scale=cfg.PIXEL_SPACING,
+                        crs=epsg,
+                        fileDimensions=cfg.PATCH_SIZE,
+                        maxPixels=1e12,
+                        skipEmptyTiles=True,
+                        fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+                    )
+                else:
+                    dl_task = ee.batch.Export.image.toDrive(
+                        image=img,
+                        region=bbox.getInfo()['coordinates'],
+                        description=dl_desc,
+                        folder=f'{cfg.DOWNLOAD.DRIVE_FOLDER}_{roi_id}_{sensor}',
+                        fileNamePrefix=f'{sensor}_{roi_id}',
+                        scale=cfg.PIXEL_SPACING,
+                        crs=epsg,
+                        fileDimensions=cfg.PATCH_SIZE,
+                        maxPixels=1e12,
+                        fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+                    )
 
                 dl_task.start()

@@ -1,9 +1,7 @@
 from pathlib import Path
 from download_manager import args
 from download_manager.config import config
-from data_processing import satellite_data
 from data_processing import utils
-import data_processing.building_footprints as bf
 import json
 import ee
 import utm
@@ -31,6 +29,15 @@ def bounding_box(aoi_id: str):
     bbox = ee.Geometry.Rectangle([x_min, y_min, x_max, y_max], proj=str(crs)).transform('EPSG:4326')
     return bbox
 
+
+def epsg_utm(bbox):
+    center_point = bbox.centroid()
+    coords = center_point.getInfo()['coordinates']
+    lon, lat = coords
+    easting, northing, zone_number, zone_letter = utm.from_latlon(lat, lon)
+    return f'EPSG:326{zone_number}' if lat > 0 else f'EPSG:327{zone_number}'
+
+
 if __name__ == '__main__':
 
     # setting up config based on parsed argument
@@ -40,33 +47,37 @@ if __name__ == '__main__':
 
     ee.Initialize()
 
+    wsf2019 = ee.ImageCollection(f'users/{cfg.GEE_USERNAME}/urban_extraction_app/wsf2019')
+
     # getting metadata from csv file
-    metadata_file = SPACENET7_PATH.parent / 'sn7_metadata_urban_dataset_v2.csv'
+    metadata_file = SPACENET7_PATH.parent / 'sn7_metadata_urban_dataset.csv'
     metadata = pd.read_csv(metadata_file)
 
-    collection = []
     for index, row in metadata.iterrows():
         aoi_id = str(row['aoi_id'])
-        properties = {
-            'aoi_id': aoi_id,
-            'year': int(row['year']),
-            'month:': int(row['month']),
-            'country': str(row['country']),
-            'group': int(row['group']),
-        }
+        year = int(row['year'])
+        month = int(row['month'])
+        quality = int(row['quality'])
+
         # getting bounding box of area of interest
         bbox = bounding_box(aoi_id)
+        epsg = epsg_utm(bbox)
 
-        collection.append(ee.Feature(bbox.centroid(), properties))
+        img = wsf2019.filterBounds(bbox).mosaic().rename('wsf2019')
 
-    collection = ee.FeatureCollection(collection)
+        img_name = f'wsf2019_{aoi_id}'
 
-    dl_task = ee.batch.Export.table.toDrive(
-        collection=collection,
-        description='sites_points_sn7',
-        folder=cfg.DOWNLOAD.DRIVE_FOLDER,
-        fileNamePrefix='sites_points_sn7',
-        fileFormat=cfg.DOWNLOAD.TABLE_FORMAT
-    )
+        dl_desc = f'{aoi_id}WSF2019Download'
 
-    dl_task.start()
+        dl_task = ee.batch.Export.image.toDrive(
+            image=img,
+            region=bbox.getInfo()['coordinates'],
+            description=dl_desc,
+            folder=f'spacenet7_wsf2019',
+            fileNamePrefix=f'wsf2019_{aoi_id}',
+            scale=cfg.PIXEL_SPACING,
+            crs=epsg,
+            maxPixels=1e12,
+            fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+        )
+        dl_task.start()

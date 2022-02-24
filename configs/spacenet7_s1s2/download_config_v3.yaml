@@ -6,7 +6,7 @@ ERROR_MARGIN: 0.01
 METADATA_FILE: '/storage/shafner/spacenet7/sn7_timestamps.csv'
 
 SINGLE_S1_ORBIT: True
-S1_ORBITS_FILE: '/storage/shafner/spacenet7/sn7_orbit_numbers.json'
+S1_ORBITS_FILE: '/storage/shafner/spacenet7/s1_orbit_numbers.json'
 
 AOI_SUBSET: [
   "L15-1335E-1166N_5342_3524_13"

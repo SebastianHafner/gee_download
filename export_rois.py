@@ -41,7 +41,7 @@ if __name__ == '__main__':
                 dataset = 'validation'
             else:
                 dataset = 'unlabeled'
-            properties = {'id': roi['ID'], 'labeled': roi['LABELED'], 'dataset': dataset}
+            properties = {'id': roi['ID'], 'labeled': roi['LABELED'], 'dataset': dataset, 'crs': roi['UTM_EPSG']}
 
 
             geom = utils.extract_bbox(roi)
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     dl_task = ee.batch.Export.table.toDrive(
         collection=fc,
         description='sites',
-        folder=cfg.DOWNLOAD.DRIVE_FOLDER,
+        folder='urban_dataset_sites',
         fileNamePrefix='sites',
         fileFormat=cfg.DOWNLOAD.TABLE_FORMAT
     )
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     dl_task = ee.batch.Export.table.toDrive(
         collection=fc_points,
         description='sites_points',
-        folder=cfg.DOWNLOAD.DRIVE_FOLDER,
+        folder='urban_dataset_sites',
         fileNamePrefix='sites_points',
         fileFormat=cfg.DOWNLOAD.TABLE_FORMAT
     )
