@@ -31,21 +31,35 @@ if __name__ == '__main__':
                 # mask = building_footprints.get_building_mask(cfg, roi)
                 # mask = mask.reproject(crs=epsg, scale=cfg.PIXEL_SPACING)
                 # img = img.updateMask(mask)
-                img_name = f'buildings_{roi_id}_'
-
                 dl_desc = f'{roi_id.capitalize()}Buildings'
-                dl_task = ee.batch.Export.image.toCloudStorage(
-                    image=img,
-                    region=bbox.getInfo()['coordinates'],
-                    description=dl_desc,
-                    bucket=cfg.DOWNLOAD.BUCKET_NAME,
-                    fileNamePrefix=f'{roi_id}/buildings/{img_name}',
-                    scale=cfg.PIXEL_SPACING,
-                    crs=epsg,
-                    fileDimensions=cfg.SAMPLING.PATCH_SIZE,
-                    maxPixels=1e12,
-                    skipEmptyTiles=True,
-                    fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
-                )
+                if cfg.DOWNLOAD.TYPE == 'cloud':
+                    img_name = f'buildings_{roi_id}_'
+                    dl_task = ee.batch.Export.image.toCloudStorage(
+                        image=img,
+                        region=bbox.getInfo()['coordinates'],
+                        description=dl_desc,
+                        bucket=cfg.DOWNLOAD.BUCKET_NAME,
+                        fileNamePrefix=f'{roi_id}/buildings/{img_name}',
+                        scale=cfg.PIXEL_SPACING,
+                        crs=epsg,
+                        fileDimensions=cfg.SAMPLING.PATCH_SIZE,
+                        maxPixels=1e12,
+                        skipEmptyTiles=True,
+                        fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+                    )
 
+                else:
+                    dl_task = ee.batch.Export.image.toDrive(
+                        image=img,
+                        region=bbox.getInfo()['coordinates'],
+                        description=dl_desc,
+                        folder=f'urban_dataset_{roi_id}_buildings',
+                        fileNamePrefix=f'buildings_{roi_id}',
+                        scale=cfg.PIXEL_SPACING,
+                        crs=epsg,
+                        fileDimensions=cfg.SAMPLING.PATCH_SIZE,
+                        maxPixels=1e12,
+                        skipEmptyTiles=True,
+                        fileFormat=cfg.DOWNLOAD.IMAGE_FORMAT
+                    )
                 dl_task.start()

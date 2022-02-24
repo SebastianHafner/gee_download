@@ -61,7 +61,7 @@ if __name__ == '__main__':
                         image=img,
                         region=bbox.getInfo()['coordinates'],
                         description=dl_desc,
-                        folder=f'{cfg.DOWNLOAD.DRIVE_FOLDER}_{roi_id}_{sensor}',
+                        folder=f'urban_dataset_{roi_id}_{sensor}',
                         fileNamePrefix=f'{sensor}_{roi_id}',
                         scale=cfg.PIXEL_SPACING,
                         crs=epsg,
