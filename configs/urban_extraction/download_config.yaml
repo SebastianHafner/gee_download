@@ -3,7 +3,8 @@ PIXEL_SPACING: 10
 PATCH_SIZE: 256
 CRS: 'UTM'
 ERROR_MARGIN: 0.01
-ROIS_SUBSET: []
+ROIS_SUBSET: ['sanfrancisco', 'saopaulo', 'sandiego', 'london', 'kairo', 'riyadh', 'kuwaitcity', 'lasvegas', 'mumbai',
+    'saltlakecity', 'wuhan', 'shanghai', 'mexicocity']
 
 DOWNLOAD:
   TYPE: 'drive' # drive or cloud
@@ -15,8 +16,7 @@ DOWNLOAD:
 MICROSOFT_BUILDINGS:
   ID: 'buildings'
   PIXEL_PERCENTAGE: True
-  ASSETS: ['sanfrancisco', 'saopaulo', 'sandiego', 'london', 'kairo', 'riyadh', 'kuwaitcity', 'lasvegas', 'mumbai',
-  'saltlakecity', 'wuhan', 'shanghai', 'mexicocity']
+  ASSETS: []
 
 SATELLITE_DATA:
   RECORDS:
