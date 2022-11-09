@@ -50,6 +50,29 @@ def single_orbit_mean(patch: ee.Geometry, date_range, orbit_number: int = None) 
     return img
 
 
+def single_orbit_mean_scene_number(patch: ee.Geometry, date_range, orbit_number: int = None) -> ee.Image:
+    # sup-setting data
+    col = ee.ImageCollection('COPERNICUS/S1_GRD') \
+        .filterBounds(patch) \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterMetadata('instrumentMode', 'equals', 'IW') \
+        .filterMetadata('transmitterReceiverPolarisation', 'equals', ['VV', 'VH'])
+
+    # masking noise
+    col = col.map(lambda img: img.updateMask(img.gte(-25)))
+
+    # using orbit with more scenes if no orbit number is passed
+    if orbit_number is None:
+        asc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'ASCENDING')
+        # print('asc', asc_col.size().getInfo())
+        desc_col = col.filterMetadata('orbitProperties_pass', 'equals', 'DESCENDING')
+        # print('desc', desc_col.size().getInfo())
+        col = ee.Algorithms.If(ee.Number(asc_col.size()).gt(desc_col.size()), asc_col, desc_col)
+        col = ee.ImageCollection(col)
+        # print(col.size().getInfo())
+    return col.size().getInfo()
+
+
 def single_orbit_metrics(patch: ee.Geometry, date_range) -> ee.Image:
     # sup-setting data
     col = ee.ImageCollection('COPERNICUS/S1_GRD') \

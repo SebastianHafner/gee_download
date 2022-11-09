@@ -121,6 +121,11 @@ def read_json(file: Path):
     return d
 
 
+def write_json(file: Path, data):
+    with open(str(file), 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+
 if __name__ == '__main__':
     year = 2019
     month = 6

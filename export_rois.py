@@ -14,19 +14,19 @@ if __name__ == '__main__':
 
     ee.Initialize()
 
-    training = ['albuquerque', 'atlanta', 'charlston', 'columbus', 'dallas', 'denver', 'elpaso', 'houston',
-                'kansascity', 'lasvegas', 'losangeles', 'miami', 'minneapolis', 'montreal', 'phoenix', 'quebec',
-                'saltlakecity', 'sandiego', 'santafe', 'seattle', 'stgeorge', 'toronto', 'tucson', 'winnipeg']
+    training = ['albuquerque', 'atlantaeast', 'atlantawest', 'charlston', 'columbus', 'dallas', 'denver', 'elpaso',
+                'houston', 'kansascity', 'lasvegas', 'losangeles', 'miami', 'minneapolis', 'montreal', 'phoenix',
+                'quebec', 'saltlakecity', 'sandiego', 'santafe', 'seattle', 'stgeorge', 'toronto', 'tucson', 'winnipeg',
+                'sidney', 'perth']
     validation = ['calgary', 'newyork', 'sanfrancisco', 'vancouver']
-    unlabeled = ['beijing', 'dakar', 'dubai', 'jakarta', 'kairo', 'kigali', 'lagos', 'mexicocity', 'mumbai',
-                 'riodejanairo', 'shanghai', 'buenosaires', 'bogota', 'sanjose', 'santiagodechile', 'kapstadt',
-                 'tripoli', 'freetown', 'london', 'madrid', 'kinshasa', 'manila', 'moscow', 'newdehli', 'nursultan',
-                 'perth', 'tokio', 'stockholm', 'sidney', 'maputo', 'caracas', 'santacruzdelasierra', 'saopaulo',
-                 'asuncion', 'lima', 'paramaribo', 'libreville', 'djibuti', 'beirut', 'baghdad', 'athens', 'islamabad',
-                 'hanoi', 'bangkok', 'dhaka', 'bengaluru', 'taipeh', 'berlin', 'nanning', 'wuhan', 'daressalam',
-                 'milano', 'zhengzhou', 'hefei', 'xian', 'seoul', 'ibadan', 'benincity', 'abidjan', 'accra',
-                 'amsterdam', 'riyadh', 'amman', 'damascus', 'nouakchott', 'prague', 'sanaa', 'dahmar', 'kuwaitcity',
-                 'tindouf', 'tehran']
+    unlabeled = ['beijing', 'dubai', 'jakarta', 'kairo', 'kigali', 'lagos', 'mexicocity', 'mumbai', 'riodejanairo',
+                 'shanghai', 'buenosaires', 'bogota', 'sanjose', 'santiagodechile', 'kapstadt', 'tripoli', 'freetown',
+                 'london', 'madrid', 'kinshasa', 'manila', 'moscow', 'newdehli', 'nursultan', 'tokio', 'stockholm',
+                 'maputo', 'caracas', 'santacruzdelasierra', 'saopaulo', 'asuncion', 'lima', 'paramaribo',
+                 'libreville', 'djibuti', 'beirut', 'baghdad', 'athens', 'islamabad', 'hanoi', 'bangkok', 'dhaka',
+                 'bengaluru', 'taipeh', 'berlin', 'nanning', 'wuhan', 'daressalam', 'milano', 'zhengzhou', 'hefei',
+                 'xian', 'seoul', 'ibadan', 'benincity', 'abidjan', 'accra', 'amsterdam', 'riyadh', 'amman',
+                 'damascus', 'nouakchott', 'prague', 'sanaa', 'kuwaitcity', 'tehran']
 
     all_sites = training + validation + unlabeled
 

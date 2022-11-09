@@ -3,8 +3,7 @@ PIXEL_SPACING: 10
 PATCH_SIZE: 256
 CRS: 'UTM'
 ERROR_MARGIN: 0.01
-ROIS_SUBSET: ['sanfrancisco', 'saopaulo', 'sandiego', 'london', 'kairo', 'riyadh', 'kuwaitcity', 'lasvegas', 'mumbai',
-    'saltlakecity', 'wuhan', 'shanghai', 'mexicocity']
+ROIS_SUBSET: ['lasvegas', 'saltlakecity', 'sandiego', 'sanfrancisco']
 
 DOWNLOAD:
   TYPE: 'drive' # drive or cloud
@@ -466,6 +465,18 @@ ROIS:
   - ID: 'atlanta'
     UTM_EPSG: 'EPSG:32616'
     LNG_RANGE: [-84.91047487729355, -83.7761364983873]
+    LAT_RANGE: [33.3806111521537, 34.14779620397614]
+    LABELED: True
+    BUILDING_ASSETS: ['Bing/UnitedStates/Georgia']
+  - ID: 'atlantaeast'
+    UTM_EPSG: 'EPSG:32616'
+    LNG_RANGE: [-84.3249, -83.7761364983873]
+    LAT_RANGE: [33.3806111521537, 34.14779620397614]
+    LABELED: True
+    BUILDING_ASSETS: ['Bing/UnitedStates/Georgia']
+  - ID: 'atlantawest'
+    UTM_EPSG: 'EPSG:32616'
+    LNG_RANGE: [-84.91047487729355, -84.3785]
     LAT_RANGE: [33.3806111521537, 34.14779620397614]
     LABELED: True
     BUILDING_ASSETS: ['Bing/UnitedStates/Georgia']

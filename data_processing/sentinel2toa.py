@@ -245,3 +245,61 @@ def custom_composite(roi: ee.Geometry, date_range) -> ee.Image:
 
     return img
 
+
+def custom_composite(roi: ee.Geometry, date_range) -> ee.Image:
+    s2 = ee.ImageCollection('COPERNICUS/S2') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi)
+    s2_clouds = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi)
+
+    join_condition = ee.Filter.equals(leftField='system:index', rightField='system:index')
+    s2 = ee.Join.saveFirst('cloudProbability').apply(primary=s2,
+                                                     secondary=s2_clouds,
+                                                     condition=join_condition)
+
+    # masking clouds
+    MAX_CLOUD_PROBABILITY = 80
+
+    def mask_clouds(img: ee.Image) -> ee.Image:
+        no_clouds = ee.Image(img.get('cloudProbability')).lt(MAX_CLOUD_PROBABILITY)
+        return ee.Image(img).updateMask(no_clouds)
+
+    s2 = ee.ImageCollection(s2).map(mask_clouds)
+    n = s2.size().getInfo()
+    print(f's2 images: {n}')
+    if n == 0:
+        return None
+
+    # computing median
+    img = s2.median()
+
+    img = img.unitScale(0, 10_000).clamp(0, 1)
+
+    return img
+
+
+def custom_composite_scene_number(roi: ee.Geometry, date_range) -> ee.Image:
+    s2 = ee.ImageCollection('COPERNICUS/S2') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi)
+    s2_clouds = ee.ImageCollection('COPERNICUS/S2_CLOUD_PROBABILITY') \
+        .filterDate(date_range.start(), date_range.end()) \
+        .filterBounds(roi)
+
+    join_condition = ee.Filter.equals(leftField='system:index', rightField='system:index')
+    s2 = ee.Join.saveFirst('cloudProbability').apply(primary=s2,
+                                                     secondary=s2_clouds,
+                                                     condition=join_condition)
+
+    s2 = s2.filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', 20)
+    # masking clouds
+    MAX_CLOUD_PROBABILITY = 80
+
+    def mask_clouds(img: ee.Image) -> ee.Image:
+        no_clouds = ee.Image(img.get('cloudProbability')).lt(MAX_CLOUD_PROBABILITY)
+        return ee.Image(img).updateMask(no_clouds)
+
+    s2 = ee.ImageCollection(s2).map(mask_clouds)
+    return s2.size().getInfo()
