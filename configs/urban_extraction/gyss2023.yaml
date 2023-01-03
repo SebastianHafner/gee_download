@@ -1,0 +1,29 @@
+_BASE_: "download_config_revision.yaml"
+
+DOWNLOAD:
+  TYPE: 'drive' # drive or cloud
+  BUCKET_NAME: 'gyss2023_urban_mapping'
+
+
+SATELLITE_DATA:
+  RECORDS:
+    - SENSOR: 'sentinel2'
+      PROCESSING_LEVEL: 'toa'
+      BANDS: ['B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'B8', 'B8A', 'B11', 'B12']
+      PRODUCT: 'custom_composite'
+      DATE_RANGE: ['2022-01-01', '2022-12-31']
+    - SENSOR: 'sentinel1'
+      PROCESSING_LEVEL: 'grd'
+      BANDS: ['VV', 'VH']
+      PRODUCT: 'single_orbit_mosaic'
+      DATE_RANGE: ['2022-01-01', '2022-12-31']
+
+ROIS_SUBSET: ['singapore2022']
+
+ROIS:
+  - ID: 'singapore2022'
+    UTM_EPSG: 'EPSG:32648'
+    LNG_RANGE: [103.606, 104.089]
+    LAT_RANGE: [1.163, 1.475]
+    LABELED: False
+    BUILDING_ASSETS: []
